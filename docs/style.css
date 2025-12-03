@@ -2,7 +2,7 @@
     color-scheme: light dark;
     --main-bg-color: light-dark(rgb(224, 224, 224), rgb(32, 32, 32));
     --main-fg-color: light-dark(rgb(192, 192, 192), rgb(64, 64, 64));
-    --main-text-color: light-dark(rgb(64, 64, 64), rgb(192, 192, 192));
+    --main-font-color: light-dark(rgb(64, 64, 64), rgb(192, 192, 192));
 
     touch-action: none;
     background-color: var(--main-bg-color);
@@ -57,7 +57,7 @@
     aspect-ratio: 1 / 1;
     margin: 0.5%;
     font: 32px sans-serif;
-    color: var(--main-text-color);
+    color: var(--main-font-color);
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
