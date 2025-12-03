@@ -51,12 +51,12 @@
 
 .circle-button {
     float: left;
-    width: 10%;
+    width: 5%;
     height: auto;
-    max-width: 80px;
+    max-width: 48px;
     aspect-ratio: 1 / 1;
     margin: 0.5%;
-    font: 300% sans-serif;
+    font: 32px sans-serif;
     color: var(--main-text-color);
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
