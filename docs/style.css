@@ -70,9 +70,11 @@
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
+    transition: background-color 0.3s, scale 0.3s;
 }
 
 .circle-button:active {
     background-color: var(--main-fg-color);
     scale: 0.95;
+    transition: background-color 0s, scale 0s;
 }
