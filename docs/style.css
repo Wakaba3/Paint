@@ -56,11 +56,16 @@
     float: left;
     width: 5%;
     height: auto;
+    min-width: 32px;
+    min-height: 32px;
     max-width: 48px;
+    max-height: 48px;
     aspect-ratio: 1 / 1;
     margin: 0.5%;
-    font: 32px sans-serif;
+    text-align: center;
+    font: sans-serif;
     color: var(--main-font-color);
+    overflow: hidden;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
