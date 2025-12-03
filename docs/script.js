@@ -2,11 +2,10 @@ const canvas = document.getElementById("canvas");
 const gl = canvas.getContext("webgl");
 const worker = new Worker("worker.js");
 
-canvas.addEventListener("click", () => {
-    worker.postMessage("Canvas was clicked!");
-});
-
 main();
+
+onmessage = event => {
+};
 
 function main() {
     if (!gl) {

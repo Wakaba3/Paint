@@ -22,14 +22,39 @@
     border-radius: 10px;
 }
 
-#menu {
+#menu-top {
+    position: absolute;
+    left: 50%;
+    top: 0%;
+    transform: translate(-50%, 0%);
+    width: 99%;
+    height: 10%;
+    display: flex;
+}
+
+#undo {}
+
+#redo {}
+
+#menu-bottom {
     position: absolute;
     left: 50%;
     top: 99%;
     transform: translate(-50%, -100%);
     width: 99%;
     height: 10%;
+    display: flex;
     overflow: hidden;
+    border: thin solid var(--main-fg-color);
+    border-radius: 10px;
+    background-color: var(--main-bg-color);
+}
+
+.circle-button {
+    width: 5%;
+    aspect-ratio: 1 / 1;
+    justify-content: center;
+    align-items: center;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
