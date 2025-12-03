@@ -56,7 +56,7 @@
     max-width: 50px;
     aspect-ratio: 1 / 1;
     margin: 0.5%;
-    font: 200% cursive;
+    font: 200% sans-serif;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
