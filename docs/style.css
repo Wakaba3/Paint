@@ -56,7 +56,7 @@
     background-color: var(--main-bg-color);
 }
 
-.circle-button {
+.generic-button {
     touch-action: manipulation;
     min-width: 48px;
     max-width: 64px;
@@ -72,7 +72,7 @@
     transition: background-color 0.25s
 }
 
-.circle-button:active {
+.generic-button:active {
     background-color: var(--main-fg-color);
     transition: background-color 0s;
 }
