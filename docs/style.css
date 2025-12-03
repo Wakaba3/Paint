@@ -2,6 +2,7 @@
     color-scheme: light dark;
     --main-bg-color: light-dark(rgb(224, 224, 224), rgb(32, 32, 32));
     --main-fg-color: light-dark(rgb(192, 192, 192), rgb(64, 64, 64));
+    --main-txt-color: lihgt-dark(rgb(32, 32, 32), rgb(224, 224, 224));
 
     touch-action: none;
     background-color: var(--main-bg-color);
@@ -29,7 +30,6 @@
     transform: translate(-50%, 0%);
     width: 99%;
     height: 10%;
-    display: flex;
 }
 
 #undo {}
@@ -43,7 +43,6 @@
     transform: translate(-50%, -100%);
     width: 99%;
     height: 10%;
-    display: flex;
     overflow: hidden;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
@@ -51,11 +50,19 @@
 }
 
 .circle-button {
-    width: 5%;
+    float: left;
+    width: 10%;
+    height: auto;
+    max-width: 50px;
     aspect-ratio: 1 / 1;
-    justify-content: center;
-    align-items: center;
+    margin: 0.5%;
+    font: 200% cursive;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
+    transition: var(--main-bg-color) 0.3s ease;
+}
+
+.circle-button:active {
+    background-color: var(--main-fg-color);
 }
