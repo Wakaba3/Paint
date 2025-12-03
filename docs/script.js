@@ -4,12 +4,16 @@ const worker = new Worker("worker.js");
 
 main();
 
-onmessage = event => {
-};
-
 function main() {
     if (!gl) {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.");
         return;
     }
 }
+
+onmessage = event => {
+};
+
+addEventListener("toutchmove", event => {
+    event.preventDefault();
+}, { passive: false }); 
