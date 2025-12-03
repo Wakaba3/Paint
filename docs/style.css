@@ -4,6 +4,8 @@
     --main-fg-color: light-dark(rgb(192, 192, 192), rgb(64, 64, 64));
     --main-font-color: light-dark(rgb(64, 64, 64), rgb(192, 192, 192));
 
+    user-select: none;
+    touch-action: manipulation;
     background-color: var(--main-bg-color);
 }
 
