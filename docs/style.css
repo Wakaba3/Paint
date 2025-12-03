@@ -63,7 +63,7 @@
     aspect-ratio: 1 / 1;
     margin: 0.5%;
     text-align: center;
-    font: sans-serif;
+    font: 150% serif;
     color: var(--main-font-color);
     overflow: hidden;
     border: thin solid var(--main-fg-color);
