@@ -2,7 +2,9 @@ const canvas = document.getElementById("canvas");
 const gl = canvas.getContext("webgl");
 const worker = new Worker("worker.js");
 
-console.log(window.Worker);
+canvas.addEventListener("click", () => {
+    worker.postMessage("Canvas was clicked!");
+});
 
 main();
 
