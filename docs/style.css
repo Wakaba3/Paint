@@ -10,6 +10,7 @@
 #content {
     pointer-events: none;
     touch-action: none;
+    -webkit-user-select: none;
     user-select: none;
     position: absolute;
     left: 50%;
