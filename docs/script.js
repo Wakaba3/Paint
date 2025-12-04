@@ -47,22 +47,16 @@ function loadShaderProgram(gl, vsUrl, fsUrl) {
     if (!gl)
         return null;
 
-    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsUrl);
-    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsUrl);
-
     const shaderProgram = gl.createProgram();
 
-    if (vertexShader && fragmentShader) {
-        try {
-            gl.attachShader(shaderProgram, vertexShader);
-            gl.attachShader(shaderProgram, fragmentShader);
-            gl.linkProgram(shaderProgram);
-
-            if (gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-                return shaderProgram; // Successful
-        } catch (error) {}
-    }
+    loadShader(gl, gl.VERTEX_SHADER, vsUrl).then(vertexShader => gl.attachShader(shaderProgram, vertexShader));
+    loadShader(gl, gl.FRAGMENT_SHADER, fsUrl).then(fragmentShader => gl.attachShader(shaderProgram, fragmentShader));
     
+    gl.linkProgram(shaderProgram);
+    if (gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+        return shaderProgram; // Successful
+    
+    // Error
     console.error("Failed to initialize the shader program");
     gl.deleteProgram(shaderProgram);
 
