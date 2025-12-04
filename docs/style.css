@@ -26,40 +26,80 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 95%;
+    max-height: 95%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
 }
 
-#menu-left {
+#menu-top {
+    display: grid;
+    grid-template-columns: repeat(32, 1fr);
+    justify-items: center;
+    align-items: center;
     position: absolute;
+    left: 50%;
+    top: 0%;
+    transform: translate(-50%, 0%);
     width: 100%;
-    height: 10%;
+    height: 64px;
+    padding: 1%;
 }
 
-#menu-right {
-    position: absolute;
-    width: 100%;
-    height: 10%;
+#undo {
+    grid-column: 1;
+}
+
+#redo {
+    grid-column: 2;
+}
+
+#zoom-in {
+    grid-column: 31;
+}
+
+#zoom-out {
+    grid-column: 32;
+}
+
+#file {
+    grid-column: 32;
 }
 
 #menu-bottom {
+    display: grid;
+    grid-template-columns: repeat(32, 1fr);
+    justify-items: center;
+    align-items: center;
     position: absolute;
     left: 50%;
     top: 100%;
     transform: translate(-50%, -100%);
     width: 100%;
-    height: 10%;
+    height: 64px;
+    padding: 1%;
     overflow: hidden;
     border: thin solid var(--main-fg-color);
     border-radius: 10px;
     background-color: var(--main-bg-color);
 }
 
-.generic-button {
+.borderless-button {
+    border: none;
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+.bordered-button {
+    overflow: hidden;
+    border: thin solid var(--main-fg-color);
+    border-radius: 10px;
+    background-color: var(--main-bg-color);
+}
+
+.borderless-button, .bordered-button {
     pointer-events: auto;
     width: 10%;
     min-width: 48px;
@@ -69,14 +109,10 @@
     text-align: center;
     font: 150% sans-serif;
     color: var(--main-font-color);
-    overflow: hidden;
-    border: thin solid var(--main-fg-color);
-    border-radius: 10px;
-    background-color: var(--main-bg-color);
     transition: background-color 0.25s
 }
 
-.generic-button:active {
+.borderless-button:active, .bordered-button:active {
     background-color: var(--main-fg-color);
     transition: background-color 0s;
 }
