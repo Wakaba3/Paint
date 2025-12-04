@@ -21,7 +21,7 @@
 }
 
 #canvas {
-    pointer-events: all;
+    pointer-events: auto;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -60,7 +60,7 @@
 }
 
 .generic-button {
-    pointer-events: all;
+    pointer-events: auto;
     width: 10%;
     min-width: 48px;
     max-width: 64px;
