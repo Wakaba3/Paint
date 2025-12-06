@@ -12,16 +12,27 @@
 </head>
 
 <body>
+    <div id="popup" class="popup-disabled bordered-menu">
+        <div id="popup-bar">
+            <div id="popup-title">Title</div>
+            <button id="popup-close" onclick="closePopup()">✕</button>
+        </div>
+        <div id="popup-content">
+            <div id="popup-file" hidden></div>
+        </div>
+    </div>
+
     <div id="content">
         <canvas id="view" width="800" height="800"></canvas>
+        
         <div id="menu-top">
-            <button id="undo" class="bordered-button" onclick="undoActivity()" disabled>&lt;</button>
-            <button id="redo" class="bordered-button" onclick="redoActivity()" disabled>&gt;</button>
-            <button id="zoom-in" class="bordered-button" onclick="zoom(0.1)">+</button>
-            <button id="zoom-out" class="bordered-button" onclick="zoom(-0.1)">-</button>
+            <button id="undo" class="bordered-button" onclick="undoActivity()" disabled>＜</button>
+            <button id="redo" class="bordered-button" onclick="redoActivity()" disabled>＞</button>
+            <button id="zoom-in" class="bordered-button" onclick="zoom(0.1)">＋</button>
+            <button id="zoom-out" class="bordered-button" onclick="zoom(-0.1)">−</button>
         </div>
-        <div id="menu-bottom">
-            <button id="file" class="borderless-button">≡</button>
+        <div id="menu-bottom" class="bordered-menu">
+            <button id="file" class="borderless-button" onclick="openOrClosePopup('File', 300, 300)">≡</button>
         </div>
     </div>
 </body>

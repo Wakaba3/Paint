@@ -18,3 +18,10 @@ class Activity {
         this.#tasks.forEach(task => task());
     }
 }
+
+class Layer {
+    constructor(imageData) {
+        this.imageData = imageData;
+        this.blending = "source-over";
+    }
+}
