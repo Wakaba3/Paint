@@ -1,186 +1,168 @@
-const canvas = document.getElementById("canvas");
-const gl = initWebGL(canvas);
-//const worker = new Worker("worker.js");
-
-const shaderProgram = loadShaderProgram(gl, "shaders/shader.vert", "shaders/shader.frag");
+const view = document.getElementById("view");
+const vctx = view.getContext("2d");
 
 const undo = document.getElementById("undo");
 const redo = document.getElementById("redo");
 
-const MAX_ACTIVITIES_LENGTH = 256;
-const activities = [];
-let activityIndex = 0;
+// Activity
+const MAX_ACTIVITIES = 64;
+let activities = [];
+let buildingActivity = null; // Nullable
+let activityIndex = 0; // 0 <= activityIndex <= activities.length;
 
-const pointers = [];
+// Camera
+let cameraX = 0;
+let cameraY = 0;
+let displayScale = 1 // displayScale > 0;
 
+// Canvas
+let layers = [];
+let bindingLayer = null; // Nullable
+let canvasX = 0;
+let canvasY = 0;
+let canvasWidth = 0;
+let canvasHeight = 0;
+
+// Drawing
+let pointers = [];
 let isDrawing = false;
-let drawingKey = 0;
 
-onmessage = event => {
-};
+// Prevent right clicking
+addEventListener("contextmenu", event => event.preventDefault(), { passive: false });
 
-addEventListener("toutchmove", event => {
-    event.preventDefault();
-}, { passive: false });
+// Prevent touch scrolling
+addEventListener("toutchmove", event => event.preventDefault(), { passive: false });
 
-canvas.addEventListener("pointerdown", startDrawing);
-canvas.addEventListener("pointermove", updateDrawing);
-canvas.addEventListener("pointerup", finishDrawing);
+view.addEventListener("pointerdown", startDrawing);
+view.addEventListener("pointermove", continueDrawing);
+view.addEventListener("pointerup", finishDrawing);
 
-// Execute
-main();
-
-function main() {
+function updateElements() {
+    undo.disabled = activityIndex <= 0;
+    redo.disabled = activityIndex >= activities.length;
 }
 
-function initWebGL(canvas) {
-    const gl = canvas.getContext("webgl");
+function addSimpleActivity(task) {
+    startActivity(task);
+    finishActivity();
+}
 
-    if (!gl) {
-        console.error("Failed to initialize WebGL. Your browser or machine may not support it.");
+function startActivity(task) {
+    if (buildingActivity) {
+        finishActivity();
     }
 
-    return gl;
+    // Remove activities that can be redone
+    if (activityIndex < activities.length) {
+        activities = activities.slice(0, activityIndex);
+    }
+
+    // Build an activity
+    buildingActivity = new Activity();
+    activityIndex = activities.length;
+
+    buildingActivity.executeAndRegister(task);
+
+    updateElements();
 }
 
-async function loadShaderProgram(gl, vsUrl, fsUrl) {
-    if (!gl)
-        return null;
-
-    const shaderProgram = gl.createProgram();
-
-    await loadShader(gl, gl.VERTEX_SHADER, vsUrl).then(vertexShader => gl.attachShader(shaderProgram, vertexShader));
-    await loadShader(gl, gl.FRAGMENT_SHADER, fsUrl).then(fragmentShader => gl.attachShader(shaderProgram, fragmentShader));
-    
-    gl.linkProgram(shaderProgram);
-    if (gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-        return shaderProgram; // Successful
-    
-    // Error
-    console.error("Failed to initialize the shader program");
-    console.error("Vertex shader: ", vsUrl);
-    console.error("Fragment shader: ", fsUrl);
-
-    gl.deleteProgram(shaderProgram);
-
-    return null;
+function continueActivity(task) {
+    if (buildingActivity) {
+        buildingActivity.executeAndRegister(task);
+    }
 }
 
-async function loadShader(gl, type, url) {
-    const source = await loadShaderSource(url);
+function finishActivity(task) {
+    if (buildingActivity) {
+        buildingActivity.executeAndRegister(task);
 
-    if (source) {
-        const shader = gl.createShader(type);
-        
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
+        // Add a built activity
+        activities.splice(activityIndex, 0, buildingActivity);
+        buildingActivity = null;
+        ++activityIndex;
 
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            console.error("Failed to complie the shader: ", gl.getShaderInfoLog(shader));
-            gl.deleteShader(shader);
-            
-            return null;
+        // Shift
+        if (activities.length >= MAX_ACTIVITIES) {
+            activities.shift();
+            activityIndex = MAX_ACTIVITIES;
         }
 
-        return shader;
-    } else {
-        return null;
+        updateElements();
     }
 }
 
-async function loadShaderSource(url) {
-    try {
-        const source = (await fetch(url)).text();
-
-        if (source)
-            return source;
-    } catch (error) {}
-
-    console.error("Failed to load the shader source: ", url);
-    
-    return "";
-}
-
-function addActivity(event) {
-    if (activities.length > activityIndex) {
-        activities.splice(activityIndex);
-    }
-
-    activities.push(new Activity(event));
-    ++activityIndex;
-
-    if (activities.length > MAX_ACTIVITIES_LENGTH) {
-        activities.shift();
-        activityIndex = MAX_ACTIVITIES_LENGTH - 1;
+function replayActivity() {
+    for (let i = 0; i < activityIndex; ++i) {
+        activities[i].executeAll();
     }
 }
 
 function undoActivity() {
     if (activityIndex > 0) {
         --activityIndex;
+        replayActivity();
+        updateElements();
     }
 }
 
 function redoActivity() {
     if (activityIndex < activities.length) {
         ++activityIndex;
+        replayActivity();
+        updateElements();
     }
 }
 
-function startDrawing(event) {
-    isDrawing = true;
-    addPointer(event.clientX, event.clientY);
+function zoom(deltaScale) {
+    displayScale += deltaScale;
+
+    displayScale = Math.max(0.1, displayScale);
+    displayScale = Math.min(displayScale, 10);
 }
 
-function updateDrawing(event) {
+function addDebugActivity(output) {
+    addSimpleActivity(() => console.log(output));
+}
+
+function startDrawing(event) {
+    if (!isDrawing) {
+        isDrawing = true;
+        startActivity(() => addPointer(event.offsetX, event.offsetY));
+    }
+}
+
+function continueDrawing(event) {
     if (isDrawing) {
-        addPointer(event.clientX, event.clientY);
+        continueActivity(() => addPointer(event.offsetX, event.offsetY));
     }
 }
 
 function finishDrawing(event) {
-    isDrawing = false;
-    addPointer(event.clientX, event.clientY);
-    resetPointers();
-}
-
-function resetPointers() {
-    let copiedPointers = pointers.slice();
-
-    addActivity(() => {
-        copiedPointers.forEach(pointer => {
-            addPointer(pointer.x, pointer.y);
+    if (isDrawing) {
+        isDrawing = false;
+        finishActivity(() => {
+            addPointer(event.offsetX, event.offsetY);
+            debugPointers();
+            clearPointers();
         });
-    });
-
-    pointers.length = 0;
+    }
 }
 
 function addPointer(x, y) {
-    pointers.push({x: x, y: y});
+    pointers.push(transformCoords(x, y));
 }
 
-class Activity {
-    constructor(event) {
-        this.event = event;
-    }
-
-    execute() {
-        this.event();
-    }
+function debugPointers() {
+    pointers.forEach(pointer => console.log("(x, y): (", pointer.x, ", ", pointer.y, ")"));
 }
 
-class Position {
-    constructor(x, y) {
-        this._x = x;
-        this._y = y;
-    }
+function clearPointers() {
+    pointers = [];
+}
 
-    get x() {
-        return this._x;
-    }
-
-    get y() {
-        return this._y;
-    }
+function transformCoords(x, y) {
+    return {
+        x: x / displayScale + cameraX - canvasX,
+        y: y / displayScale + cameraY - canvasY
+    };
 }

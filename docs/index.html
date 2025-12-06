@@ -7,17 +7,18 @@
     <meta name="X-Content-Type-Options" content="nosniff">
     <title>Pixels</title>
     <link rel="stylesheet" type="text/css" href="style.css?version=0">
-    <script type="text/javascript" src="script.js?version=0" defer></script>
+    <script defer type="text/javascript" src="modules.js?version=0"></script>
+    <script defer type="text/javascript" src="script.js?version=0"></script>
 </head>
 
 <body>
     <div id="content">
-        <canvas id="canvas" width="800" height="800"></canvas>
+        <canvas id="view" width="800" height="800"></canvas>
         <div id="menu-top">
-            <button id="undo" class="bordered-button" onclick="undoActivity()">&lt;</button>
-            <button id="redo" class="bordered-button" onclick="redoActivity()">&gt;</button>
-            <button id="zoom-in" class="bordered-button">+</button>
-            <button id="zoom-out" class="bordered-button">-</button>
+            <button id="undo" class="bordered-button" onclick="undoActivity()" disabled>&lt;</button>
+            <button id="redo" class="bordered-button" onclick="redoActivity()" disabled>&gt;</button>
+            <button id="zoom-in" class="bordered-button" onclick="zoom(0.1)">+</button>
+            <button id="zoom-out" class="bordered-button" onclick="zoom(-0.1)">-</button>
         </div>
         <div id="menu-bottom">
             <button id="file" class="borderless-button">≡</button>

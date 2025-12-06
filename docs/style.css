@@ -20,7 +20,7 @@
     height: 95%;
 }
 
-#canvas {
+#view {
     pointer-events: auto;
     position: absolute;
     left: 50%;
@@ -100,7 +100,6 @@
 }
 
 .borderless-button, .bordered-button {
-    pointer-events: auto;
     width: 10%;
     min-width: 48px;
     max-width: 64px;
@@ -108,11 +107,20 @@
     margin: 0.5%;
     text-align: center;
     font: 150% sans-serif;
-    color: var(--main-font-color);
     transition: background-color 0.25s
 }
 
 .borderless-button:active, .bordered-button:active {
     background-color: var(--main-fg-color);
     transition: background-color 0s;
+}
+
+.borderless-button:disabled, .bordered-button:disabled {
+    pointer-events: none;
+    color: var(--main-fg-color);
+}
+
+.borderless-button:enabled, .bordered-button:enabled {
+    pointer-events: auto;
+    color: var(--main-font-color);
 }

@@ -1,2 +1,0 @@
-onmessage = event => {
-};
