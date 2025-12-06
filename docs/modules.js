@@ -37,6 +37,9 @@ class Popup {
         this.#bar.classList.add("popup-bar");
         this.#title.classList.add("popup-title");
         this.#close.classList.add("popup-close");
+        this.#content.classList.add("popup-content");
+
+        this.#close.setAttribute("translate", "no");
 
         this.#title.textContent = title;
         this.#close.textContent = "✕";
@@ -125,6 +128,15 @@ class Popup {
         this.#popup.style.height = this.#height + "px";
     }
 
+    setContent(content) {
+        // Clear
+        while (this.#content.firstChild) {
+            this.#content.removeChild(this.#content.firstChild);
+        }
+
+        this.#content.appendChild(content);
+    }
+
     isEnabled() {
         return this.#popup.classList.contains("popup-enabled");
     }
@@ -140,11 +152,13 @@ class Popup {
             if (id.endsWith("-bar")) {
                 Popup.#dragging = Popup.#get(id.substring(0, id.length - 4));
 
-                if (Popup.#dragging) {
+                if (Popup.#dragging instanceof Popup) {
                     Popup.#dragging.#offsetX = parseInt(Popup.#dragging.#popup.style.left) - event.pageX;
                     Popup.#dragging.#offsetY = parseInt(Popup.#dragging.#popup.style.top) - event.pageY;
 
                     Popup.#dragging.locate(event.pageX, event.pageY);
+                } else {
+                    Popup.#dragging = null;
                 }
             }
         }

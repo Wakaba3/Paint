@@ -149,6 +149,10 @@
     transition: background-color 0s;
 }
 
+.popup-content {
+    pointer-events: auto;
+}
+
 .borderless-button {
     border: none;
     border-radius: 10px;

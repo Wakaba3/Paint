@@ -16,13 +16,13 @@
         <canvas id="view" width="800" height="800"></canvas>
         
         <div id="menu-top">
-            <button id="undo" class="bordered-button" onclick="undoActivity()" disabled>＜</button>
-            <button id="redo" class="bordered-button" onclick="redoActivity()" disabled>＞</button>
-            <button id="zoom-in" class="bordered-button" onclick="zoom(0.1)">＋</button>
-            <button id="zoom-out" class="bordered-button" onclick="zoom(-0.1)">−</button>
+            <button id="undo" class="bordered-button" translate="no" onclick="undoActivity()" disabled>＜</button>
+            <button id="redo" class="bordered-button" translate="no" onclick="redoActivity()" disabled>＞</button>
+            <button id="zoom-in" class="bordered-button" translate="no" onclick="zoom(0.1)">＋</button>
+            <button id="zoom-out" class="bordered-button" translate="no" onclick="zoom(-0.1)">−</button>
         </div>
         <div id="menu-bottom" class="bordered-menu">
-            <button id="file" class="borderless-button" onclick="Popup.openOrClose('file-popup')">＝</button>
+            <button id="file" class="borderless-button" translate="no" onclick="Popup.openOrClose('file-popup')">＝</button>
         </div>
     </div>
 </body>

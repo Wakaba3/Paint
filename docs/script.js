@@ -5,7 +5,10 @@ const undo = document.getElementById("undo");
 const redo = document.getElementById("redo");
 
 // Register popups
-new Popup("file-popup", "File");
+new Popup("file-popup", "File").open();
+new Popup("nitroglycerin-popup", "Nitroglycerin").open();
+new Popup("trinitrotoluene-popup", "Trinitrotoluene").open();
+new Popup("ammonium-nitrate-popup", "Ammonium Nitrate").open();
 
 // Activity
 const MAX_ACTIVITIES = 64;
