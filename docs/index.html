@@ -4,27 +4,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="X-Content-Type-Options" content="nosniff">
-    <title>Pixels</title>
+    <title>Paint</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script defer type="text/javascript" src="modules.js"></script>
     <script defer type="text/javascript" src="script.js"></script>
 </head>
 
 <body>
-    <div id="content">
-        <canvas id="view" width="800" height="800"></canvas>
-        
-        <div id="menu-top">
-            <button id="undo" class="bordered-button" translate="no" onclick="undoActivity()" disabled>＜</button>
-            <button id="redo" class="bordered-button" translate="no" onclick="redoActivity()" disabled>＞</button>
-            <button id="zoom-in" class="bordered-button" translate="no" onclick="zoom(0.1)">＋</button>
-            <button id="zoom-out" class="bordered-button" translate="no" onclick="zoom(-0.1)">−</button>
-        </div>
-        <div id="menu-bottom" class="bordered-menu">
-            <button id="file" class="borderless-button" translate="no" onclick="Popup.openOrClose('file-popup')">＝</button>
-        </div>
-    </div>
 </body>
 
 </html>
