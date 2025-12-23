@@ -1,7 +1,8 @@
 :root {
     color-scheme: light dark;
-    --main-bg-color: light-dark(rgb(224, 224, 224), rgb(32, 32, 32));
-    --main-fg-color: light-dark(rgb(192, 192, 192), rgb(64, 64, 64));
 
-    background-color: var(--main-bg-color);
+    --background-color: light-dark(rgb(224, 224, 224), rgb(32, 32, 32));
+    --foreground-color: light-dark(rgb(192, 192, 192), rgb(64, 64, 64));
+
+    background-color: var(--background-color);
 }
