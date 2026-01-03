@@ -2,7 +2,7 @@ setup();
 
 function setup() {
     //Style definition
-    let style = document.createElement("style");
+    const style = document.createElement("style");
 
     style.textContent = `
         .popup {
@@ -54,11 +54,11 @@ function setup() {
     document.body.appendChild(style);
 
     //Element Modification
-    let nodes = document.querySelectorAll(".popup");
+    const popups = document.querySelectorAll(".popup");
     
     let contents, body, close, onclick, children;
 
-    nodes.forEach(node => {
+    popups.forEach(popup => {
         contents = document.createElement("div");
         body = document.createElement("div");
         close = document.createElement("div");
@@ -70,53 +70,83 @@ function setup() {
         close.classList.add("popup-close");
 
         close.textContent = "Close";
-        onclick.value = "openOrClosePopup('" + node.id + "')";
+        onclick.value = "openOrClosePopup('" + popup.id + "')";
 
-        node.childNodes.forEach(child => {
+        popup.childNodes.forEach(child => {
             if (child instanceof Node) {
                 children.push(child);
             }
         });
 
         close.setAttributeNode(onclick);
-        node.hidden = true;
-        node.textContent = "";
+        popup.hidden = true;
+        popup.textContent = "";
 
         children.forEach(child => body.appendChild(child));
         contents.appendChild(body);
         contents.appendChild(close);
-        node.appendChild(contents);
+        popup.appendChild(contents);
     });
 
-    //Dragging definition
-    let draggingPopups = [];
+    //Popup handling
+    const params = new Map();
+
+    popups.forEach(popup => {
+        params.set(popup, {
+            dragging: false,
+            offsetX: 0,
+            offsetY: 0,
+            normalX: 0.5,
+            normalY: 0.5
+        });
+    });
 
     addEventListener("pointerdown", event => {
-        let target = event.target;
+        const target = event.target;
 
-        if (target instanceof HTMLElement && target.classList.contains("popup")) {
-            draggingPopups.push([target, target.offsetLeft, target.offsetTop, target.offsetLeft - event.pageX, target.offsetTop - event.pageY]);
+        if (target instanceof HTMLElement && target.classList.contains("popup") && target.hasAttribute("draggable")) {
+            const param = params.get(target);
+
+            param.dragging = true;
+            param.offsetX = target.offsetLeft - event.pageX;
+            param.offsetY = target.offsetTop - event.pageY;
         }
     });
 
     addEventListener("pointermove", event => {
-        draggingPopups.forEach(popup => {
-            popup[0].style.left = (event.pageX + popup[3]) + "px";
-            popup[0].style.top = (event.pageY + popup[4]) + "px";
+        params.forEach((params, popup) => {
+            if (params.dragging) {
+                popup.style.left = (event.pageX + params.offsetX) + "px";
+                popup.style.top = (event.pageY + params.offsetY) + "px";
+
+                params.normalX = popup.offsetLeft / window.innerWidth;
+                params.normalY = popup.offsetTop / window.innerHeight;
+
+                console.log(params);
+            }
         });
     });
 
     addEventListener("pointerup", event => {
-        draggingPopups.length = 0;
+        params.forEach(params => params.dragging = false);
+    });
+
+    window.addEventListener("resize", event => {
+        params.forEach((params, popup) => {
+            popup.style.left = (params.normalX * window.innerWidth) + "px";
+            popup.style.top = (params.normalY * window.innerHeight) + "px";
+        });
     });
 }
 
 function openOrClosePopup(id = "") {
-    let popup = document.getElementById(id);
+    const popup = document.getElementById(id);
 
     if (popup instanceof Element) {
         popup.hidden = !popup.hidden;
         popup.style.left = (window.innerWidth / 2) + "px";
         popup.style.top = (window.innerHeight / 2) + "px";
+
+        dispatchEvent(new CustomEvent(popup.hidden ? "popupclose" : "popupopen", { detail: popup }));
     }
 }

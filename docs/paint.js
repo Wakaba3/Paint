@@ -21,17 +21,15 @@ class ImageLayer extends Layer {
     }
 }
 
-class ListLayer extends Layer {
+class LayerList {
     constructor(name = "", start = -1, length = 0) {
-        super(name);
-
-        this.layers = layers;
+        this.name = name;
         this.start = start;
         this.length = length;
     }
 
     copy() {
-        return new ListLayer(this.name, this.start, this.length);
+        return new LayerList(this.name, this.start, this.length);
     }
 }
 
@@ -44,7 +42,7 @@ class Canvas {
 
     #bindingIndex;
     #bindingLayer;
-    #bindingList;
+    #bindingLists;
     #bindingRecord;
 
     constructor(width = 0, height = 0) {
@@ -137,11 +135,11 @@ class Canvas {
         if (0 <= index && index < this.#layers.length) {
             this.#bindingIndex = index;
             this.#bindingLayer = this.#layers[index];
-            this.#bindingList = this.#getListThatIncludes(index);
+            this.#bindingLists = this.#getListsThatIncludes(index);
         } else {
             this.#bindingIndex = -1;
             this.#bindingLayer = null;
-            this.#bindingList = null;
+            this.#bindingLists = null;
         }
 
         if (this.#bindingLayer instanceof ImageLayer && this.#bindingLayer.imageData instanceof ImageData) {
@@ -153,36 +151,43 @@ class Canvas {
         this.context.clearRect(0, 0, this.width, this.height);
     }
 
-    addImage(name = "", blendMode = "source-over", binding = false) {
-        this.addLayer(new ImageLayer(name, blendMode, this.context.createImageData(this.width, this.height)), binding);
+    addImage(name = "", blendMode = "source-over") {
+        return this.#addLayer(new ImageLayer(name, blendMode, this.context.createImageData(this.width, this.height)), binding);
     }
 
-    addLayer(layer = null, binding = false) {
-        this.addLayerAt(this.#bindingIndex + 1, layer);
+    #addLayer(layer = null) {
+        return this.addLayerAt(this.#bindingIndex + 1, layer);
+    }
 
-        if (binding) {
-            this.bind(this.#bindingIndex + 1);
-        }
+    addList(name = "", start = -1, length = 0) {
+        if (!Number.isFinite(start) || !Number.isFinite(length) || start < 0 || length < 0)
+            return;
+
+        this.#lists.push(new LayerList(name, start, length));
     }
 
     addLayerAt(index = -1, layer = null) {
         if (index < 0 || index > this.#layers.length)
-            return;
+            return -1;
 
         this.#layers.splice(index, 0, layer);
         this.#shiftListIndexes(index, 1)
+
+        return index;
     }
 
     removeLayer() {
-        this.removeLayerAt(this.#bindingIndex);
+        return this.removeLayerAt(this.#bindingIndex);
     }
 
     removeLayerAt(index = -1) {
         if (index < 0 || index >= this.#layers.length)
-            return;
+            return -1;
 
         this.#layers.splice(index, 1);
         this.#shiftListIndexes(index, -1);
+
+        return index;
     }
 
     #shiftListIndexes(start = -1, amount = 0) {
@@ -190,8 +195,8 @@ class Canvas {
             return;
 
         if (Math.abs(amount) > 1) {
-            let repeats = Math.abs(amount);
-            let signum = amount > 0 ? 1 : -1;
+            const repeats = Math.abs(amount);
+            const signum = amount > 0 ? 1 : -1;
 
             for (let i = 0; i < repeats; ++i) {
                 this.#shiftListIndexes(start, signum);
@@ -211,14 +216,16 @@ class Canvas {
         });
     }
 
-    #getListThatIncludes(index) {
+    #getListsThatIncludes(index) {
+        const lists = [];
+
         this.#lists.forEach(list => {
             if (index >= list.start && index < list.start + list.length) {
-                return list;
+                lists.push(list);
             }
         });
 
-        return null;
+        return lists;
     }
 
     get context() {

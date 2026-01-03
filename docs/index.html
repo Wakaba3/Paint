@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <script defer type="text/javascript" src="popup.js"></script>
     <script defer type="text/javascript" src="paint.js"></script>
-    <script defer type="text/javascript" src="worker.js"></script>
     <script defer type="text/javascript" src="handler.js"></script>
 </head>
 
@@ -34,16 +33,17 @@
             <div></div>
             <div></div>
             <div></div>
-            <div id="file" onclick="openOrClosePopup('file-popup')">File</div>
+            <div id="file" onclick="openOrClosePopup('file-popup')">F</div>
         </div>
     </div>
 
-    <div id="file-popup" class="popup">
-        <div id="import" onclick="openOrClosePopup('import-popup')">Import Image</div>
+    <div id="file-popup" class="popup" draggable>
+        <div id="import" onclick="openOrClosePopup('chooser-popup')">Import Image</div>
         <div id="export">Export Image</div>
     </div>
 
-    <div id="import-popup" class="popup">
+    <div id="chooser-popup" class="popup" draggable>
+        <div><label for="chooser"></label><input id="chooser" type="file" accept="image/*" multiple></div>
     </div>
 </body>
 

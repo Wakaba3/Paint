@@ -8,7 +8,6 @@
 * {
     pointer-events: none;
     font: 100% serif;
-    text-shadow: 2px 2px var(--foreground-color);
     color: rgb(255, 255, 255);
 }
 
@@ -78,14 +77,13 @@ body {
     border-radius: 10px;
 }
 
-#import, #export {
+#import, #export, #chooser {
     pointer-events: auto;
     padding: 5px 30px;
-    font: 125% serif;
     text-wrap: nowrap;
     border-radius: 5px;
 }
 
-#tool-bar > div:active, #control-bar > div:active, #import:active, #export:active {
+#tool-bar > div:active, #control-bar > div:active, #import:active, #export:active, #chooser:active {
     background-color: var(--foreground-color);
 }
