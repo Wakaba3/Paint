@@ -70,6 +70,11 @@ body {
     border-radius: 10px;
 }
 
-#tool-bar > div:active, #control-bar > div:active {
+#import, #export {
+    padding: 5px 30px;
+    border-radius: 5px;
+}
+
+#tool-bar > div:active, #control-bar > div:active, #import:active, #export:active {
     background-color: var(--foreground-color);
 }
