@@ -4,15 +4,16 @@ function setup(name = "popup") {
     let fragment = document.createDocumentFragment();
 
     //Style definition
-    let popup = document.createElement("style");
+    let style = document.createElement("style");
 
-    popup.textContent = `
+    style.textContent = `
         .${name} {
+            pointer-events: auto;
             position: absolute;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            padding: 10px 50px;
+            padding: 1% 5%;
             z-index: 1;
             overflow: hidden;
             color: white;
@@ -37,6 +38,7 @@ function setup(name = "popup") {
         }
 
         .${name + "-close"} {
+            pointer-events: auto;
             flex: 1;
             padding: 0px 30px;
             z-index: 1;
@@ -71,15 +73,15 @@ function setup(name = "popup") {
         onclick.value = "closePopup('" + node.id + "')";
         state.value = "none";
 
-        close.setAttributeNode(onclick);
-        node.setAttributeNode(state);
-        node.hidden = true;
-
         node.childNodes.forEach(child => {
             if (child instanceof Node) {
                 children.push(child);
             }
         });
+
+        close.setAttributeNode(onclick);
+        node.setAttributeNode(state);
+        node.hidden = true;
         node.textContent = "";
 
         children.forEach(child => body.appendChild(child));
@@ -88,7 +90,29 @@ function setup(name = "popup") {
         node.appendChild(contents);
     });
 
-    fragment.appendChild(popup);
+    addEventListener("pointerdown", event => {
+        let target = event.target;
+
+        if (target instanceof Element) {
+            while (!target.classList.contains("popup")) {
+                if (target.offsetParent) {
+                    target = target.offsetParent;
+
+                    continue;
+                }
+
+                return;
+            }
+        }
+
+        console.log(target);
+
+        if (target && target.classList.contains("popup")) {
+            console.log("Clicked!");
+        }
+    });
+
+    fragment.appendChild(style);
 
     document.body.appendChild(fragment);
 }
