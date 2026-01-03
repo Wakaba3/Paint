@@ -40,6 +40,7 @@ function setup() {
             flex: 1;
             padding: 0px 30px;
             z-index: 1;
+            font: 125% serif;
             border: thin solid var(--foreground-color);
             border-radius: 5px;
             background-color: var(--background-color);
