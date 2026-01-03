@@ -1,13 +1,11 @@
 setup();
 
-function setup(name = "popup") {
-    let fragment = document.createDocumentFragment();
-
+function setup() {
     //Style definition
     let style = document.createElement("style");
 
     style.textContent = `
-        .${name} {
+        .popup {
             pointer-events: auto;
             position: absolute;
             left: 50%;
@@ -22,7 +20,7 @@ function setup(name = "popup") {
             background-color: var(--background-color);
         }
 
-        .${name + "-contents"} {
+        .popup-contents {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -31,13 +29,13 @@ function setup(name = "popup") {
             z-index: 0;
         }
 
-        .${name + "-body"} {
+        .popup-body {
             flex: 1;
             padding: 10px 30px;
             z-index: 0;
         }
 
-        .${name + "-close"} {
+        .popup-close {
             pointer-events: auto;
             flex: 1;
             padding: 0px 30px;
@@ -47,31 +45,31 @@ function setup(name = "popup") {
             background-color: var(--background-color);
         }
 
-        .${name + "-close"}:active {
+        .popup-close:active {
             background-color: var(--foreground-color);
         }
     `;
 
+    document.body.appendChild(style);
+
     //Element Modification
-    let nodes = document.querySelectorAll("." + name);
+    let nodes = document.querySelectorAll(".popup");
     
-    let contents, body, close, onclick, state, children;
+    let contents, body, close, onclick, children;
 
     nodes.forEach(node => {
         contents = document.createElement("div");
         body = document.createElement("div");
         close = document.createElement("div");
         onclick = document.createAttribute("onclick");
-        state = document.createAttribute("state");
         children = [];
 
-        contents.classList.add(name + "-contents");
-        body.classList.add(name + "-body");
-        close.classList.add(name + "-close");
+        contents.classList.add("popup-contents");
+        body.classList.add("popup-body");
+        close.classList.add("popup-close");
 
         close.textContent = "Close";
-        onclick.value = "closePopup('" + node.id + "')";
-        state.value = "none";
+        onclick.value = "openOrClosePopup('" + node.id + "')";
 
         node.childNodes.forEach(child => {
             if (child instanceof Node) {
@@ -80,7 +78,6 @@ function setup(name = "popup") {
         });
 
         close.setAttributeNode(onclick);
-        node.setAttributeNode(state);
         node.hidden = true;
         node.textContent = "";
 
@@ -90,31 +87,27 @@ function setup(name = "popup") {
         node.appendChild(contents);
     });
 
+    //Dragging definition
+    let draggingPopups = [];
+
     addEventListener("pointerdown", event => {
         let target = event.target;
 
-        if (target instanceof Element) {
-            while (!target.classList.contains("popup")) {
-                if (target.offsetParent) {
-                    target = target.offsetParent;
-
-                    continue;
-                }
-
-                return;
-            }
-        }
-
-        console.log(target);
-
-        if (target && target.classList.contains("popup")) {
-            console.log("Clicked!");
+        if (target instanceof HTMLElement && target.classList.contains("popup")) {
+            draggingPopups.push([target, target.offsetLeft, target.offsetTop, target.offsetLeft - event.pageX, target.offsetTop - event.pageY]);
         }
     });
 
-    fragment.appendChild(style);
+    addEventListener("pointermove", event => {
+        draggingPopups.forEach(popup => {
+            popup[0].style.left = (event.pageX + popup[3]) + "px";
+            popup[0].style.top = (event.pageY + popup[4]) + "px";
+        });
+    });
 
-    document.body.appendChild(fragment);
+    addEventListener("pointerup", event => {
+        draggingPopups.length = 0;
+    });
 }
 
 function openOrClosePopup(id = "") {
@@ -122,13 +115,7 @@ function openOrClosePopup(id = "") {
 
     if (popup instanceof Element) {
         popup.hidden = !popup.hidden;
-    }
-}
-
-function closePopup(id = "") {
-    let popup = document.getElementById(id);
-
-    if (popup instanceof Element) {
-        popup.hidden = true;
+        popup.style.left = (window.innerWidth / 2) + "px";
+        popup.style.top = (window.innerHeight / 2) + "px";
     }
 }
