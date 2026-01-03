@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paint</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script defer type="text/javascript" src="popup.js"></script>
     <script defer type="text/javascript" src="paint.js"></script>
     <script defer type="text/javascript" src="handler.js"></script>
 </head>
 
 <body>
-    <div id="border">
+    <div id="content">
         <canvas id="view" width="800" height="800"></canvas>
 
         <div id="control-bar">
@@ -32,8 +33,13 @@
             <div></div>
             <div></div>
             <div></div>
-            <div id="file"></div>
+            <div id="file" onclick="openOrClosePopup('file-popup')">F</div>
         </div>
+    </div>
+
+    <div id="file-popup" class="popup">
+        <div id="import">Import</div>
+        <div id="export">Export</div>
     </div>
 </body>
 
