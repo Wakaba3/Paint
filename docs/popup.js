@@ -121,8 +121,6 @@ function setup() {
 
                 params.normalX = popup.offsetLeft / window.innerWidth;
                 params.normalY = popup.offsetTop / window.innerHeight;
-
-                console.log(params);
             }
         });
     });

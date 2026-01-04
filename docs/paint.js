@@ -1,23 +1,12 @@
 class Layer {
-    constructor(name = "") {
-        this.name = name;
-    }
-
-    copy() {
-        return new Layer(this.name);
-    }
-}
-
-class ImageLayer extends Layer {
     constructor(name = "", blendMode = "source-over", imageData = null) {
-        super(name);
-
+        this.name = name;
         this.blendMode = blendMode;
         this.imageData = imageData;
     }
 
     copy() {
-        return new ImageLayer(this.name, this.blendMode, this.imageData);
+        return new Layer(this.name, this.blendMode, this.imageData);
     }
 }
 
@@ -33,26 +22,40 @@ class LayerList {
     }
 }
 
+class Buffer {
+    constructor(width = 0, height = 0) {
+        this.canvas = new OffscreenCanvas(width, height);
+        this.context = this.canvas.getContext("2d", { willReadFrequently : true });
+    }
+
+    resize(width = 0, height = 0) {
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0 || this.canvas.width === width && this.canvas.height === height)
+            return;
+
+        this.canvas.width = width;
+        this.canvas.height = height;
+    }
+}
+
 class Canvas {
     #canvas;
-    #context;
+    #buffer;
+
     #layers;
     #lists;
     #records;
 
     #bindingIndex;
     #bindingLayer;
-    #bindingLists;
     #bindingRecord;
 
     constructor(width = 0, height = 0) {
-        if (!Number.isFinite(width) || width < 0)
-            width = 0;
-        if (!Number.isFinite(height) || height < 0)
-            height = 0;
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0)
+            throw new Error(`Invalid size: (width, height) = (${width}, ${height})`);
 
-        this.#canvas = new OffscreenCanvas(width, height);
-        this.#context = this.#canvas.getContext("2d", { willReadFrequently : true });
+        this.#canvas = new Buffer(width, height);
+        this.#buffer = new Buffer(width, height);
+
         this.#layers = [];
         this.#lists = [];
         this.#records = [];
@@ -81,7 +84,7 @@ class Canvas {
         };
     }
 
-    #restore() {
+    #load() {
         this.decode(this.#records[this.#bindingRecord]);
         this.bind(this.#bindingLayer);
     }
@@ -98,79 +101,77 @@ class Canvas {
     }
 
     undo() {
-        if (this.#bindingRecord && this.#bindingRecord > 0) {
+        if (this.#bindingRecord > 0) {
             --this.#bindingRecord;
-            this.#restore();
+            this.#load();
         }
     }
 
     redo() {
-        if (this.#bindingRecord && this.#bindingRecord < this.#records.length - 1) {
+        if (this.#bindingRecord < this.#records.length - 1) {
             ++this.#bindingRecord;
-            this.#restore();
+            this.#load();
         }
     }
 
     resize(width = 0, height = 0) {
-        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0 || this.#canvas.width === width && this.#canvas.height === height)
-            return;
-
-        this.#canvas.width = width;
-        this.#canvas.height = height;
+        this.#canvas.resize(width, height);
+        this.#buffer.resize(width, height);
     }
 
     apply() {
-        this.bind(this.#bindingIndex);
-        this.save();
+        if (this.#bindingLayer) {
+            this.#bindingLayer.imageData = this.context.getImageData(0, 0, this.width, this.height);
+        }
     }
 
     bind(index = -1) {
-        if (this.#bindingLayer instanceof ImageLayer) {
-            this.#bindingLayer.imageData = this.context.getImageData(0, 0, this.width, this.height);
-
-            if (index === this.#bindingIndex)
-                return;
-        }
+        this.context.clearRect(0, 0, this.width, this.height);
 
         if (0 <= index && index < this.#layers.length) {
             this.#bindingIndex = index;
             this.#bindingLayer = this.#layers[index];
-            this.#bindingLists = this.#getListsThatIncludes(index);
         } else {
             this.#bindingIndex = -1;
             this.#bindingLayer = null;
-            this.#bindingLists = null;
         }
 
-        if (this.#bindingLayer instanceof ImageLayer && this.#bindingLayer.imageData instanceof ImageData) {
+        if (this.#bindingLayer) {
             this.context.putImageData(this.#bindingLayer.imageData, 0, 0);
-
-            return;
         }
-
-        this.context.clearRect(0, 0, this.width, this.height);
     }
 
-    addImage(name = "", blendMode = "source-over") {
-        return this.#addLayer(new ImageLayer(name, blendMode, this.context.createImageData(this.width, this.height)), binding);
+    composite() {
+        const context = this.context;
+        const buffer = this.#buffer.context;
+        const image = this.#buffer.canvas;
+        const width = this.width;
+        const height = this.height;
+
+        context.clearRect(0, 0, width, height);
+        buffer.clearRect(0, 0, width, height);
+
+        this.#layers.forEach(layer => {
+            buffer.putImageData(layer.imageData, 0, 0);
+
+            context.globalCompositeOperation = layer.blendMode;
+            context.drawImage(image, 0, 0);
+
+            buffer.clearRect(0, 0, width, height);
+        });
+
+        return context.getImageData(0, 0, width, height);
     }
 
-    #addLayer(layer = null) {
-        return this.addLayerAt(this.#bindingIndex + 1, layer);
+    addLayer(name = "", blendMode = "source-over") {
+        return this.addLayerAt(this.#bindingIndex + 1, name, blendMode);
     }
 
-    addList(name = "", start = -1, length = 0) {
-        if (!Number.isFinite(start) || !Number.isFinite(length) || start < 0 || length < 0)
-            return;
-
-        this.#lists.push(new LayerList(name, start, length));
-    }
-
-    addLayerAt(index = -1, layer = null) {
+    addLayerAt(index = -1, name = "", blendMode = "source-over") {
         if (index < 0 || index > this.#layers.length)
             return -1;
 
-        this.#layers.splice(index, 0, layer);
+        this.#layers.splice(index, 0, new Layer(name, blendMode, this.context.createImageData(this.width, this.height)));
         this.#shiftListIndexes(index, 1)
 
         return index;
@@ -190,53 +191,35 @@ class Canvas {
         return index;
     }
 
-    #shiftListIndexes(start = -1, amount = 0) {
-        if (!Number.isFinite(amount) || amount === 0)
-            return;
+    addList(name = "", start = -1, length = 0) {
+        this.#lists.push(new LayerList(name, start, length));
 
-        if (Math.abs(amount) > 1) {
-            const repeats = Math.abs(amount);
-            const signum = amount > 0 ? 1 : -1;
+        return true;
+    }
 
-            for (let i = 0; i < repeats; ++i) {
-                this.#shiftListIndexes(start, signum);
-            }
-
-            return;
-        }
+    #shiftListIndexes(start = -1, dir = 0) {
+        dir = Math.sign(dir);
 
         this.#lists.forEach(list => {
             if (start >= list.start) {
                 if (start < list.start + list.length) {
-                    list.length += amount;
+                    list.length += dir;
                 }
             } else {
-                list.start += amount;
+                list.start += dir;
             }
         });
-    }
-
-    #getListsThatIncludes(index) {
-        const lists = [];
-
-        this.#lists.forEach(list => {
-            if (index >= list.start && index < list.start + list.length) {
-                lists.push(list);
-            }
-        });
-
-        return lists;
     }
 
     get context() {
-        return this.#context;
+        return this.#canvas.context;
     }
 
     get width() {
-        return this.#canvas.width;
+        return this.#canvas.canvas.width;
     }
 
     get height() {
-        return this.#canvas.height;
+        return this.#canvas.canvas.height;
     }
 }
