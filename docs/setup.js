@@ -15,7 +15,6 @@ function setup() {
             max-width: 95%;
             max-height: 95%;
             z-index: 1;
-            color: white;
             overflow: hidden;
             border: thin solid var(--foreground-color);
             border-radius: 10px;
@@ -51,13 +50,69 @@ function setup() {
         .panel-close:active {
             background-color: var(--foreground-color);
         }
+
+        .message {
+            pointer-events: auto;
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            transform: translate(-50%, -25%);
+            padding: 10px 10px;
+            width: 500px;
+            max-width: 75%;
+            max-height: 75%;
+            z-index: 2;
+            font: 125% serif;
+            text-align: center;
+            overflow-wrap: break-word;
+            overflow: hidden;
+            border: thin solid var(--foreground-color);
+            border-radius: 10px;
+            background-color: var(--background-color);
+            opacity: 0;
+            animation:
+                0.5s linear 0s 1 normal forwards running message-fade-in,
+                0.5s linear 2.5s 1 normal forwards running message-fade-out;
+        }
+
+        @keyframes message-fade-in {
+            from {
+                left: 50%;
+                top: 5%;
+                transform: translate(-50%, -25%);
+                opacity: 0;
+            }
+
+            to {
+                left: 50%;
+                top: 5%;
+                transform: translate(-50%, 0%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes message-fade-out {
+            from {
+                left: 50%;
+                top: 5%;
+                transform: translate(-50%, 0%);
+                opacity: 1;
+            }
+
+            to {
+                left: 50%;
+                top: 5%;
+                transform: translate(-50%, -25%);
+                opacity: 0;
+            }
+        }
     `;
 
     document.body.appendChild(style);
 
     //Element Modification
     const panels = document.querySelectorAll(".panel");
-    
+
     let contents, body, close, onclick, children;
 
     panels.forEach(panel => {
@@ -90,7 +145,7 @@ function setup() {
         panel.appendChild(contents);
     });
 
-    //Panel handling
+    //Element handling
     const params = new Map();
 
     panels.forEach(panel => {
@@ -101,6 +156,17 @@ function setup() {
             normalX: 0.5,
             normalY: 0.5
         });
+    });
+
+    addEventListener("showmessage", event => {
+        const message = document.createElement("div");
+
+        message.classList.add("message");
+        message.textContent = event.detail;
+
+        document.body.appendChild(message);
+
+        setTimeout(() => message.remove(), 3000);
     });
 
     addEventListener("pointerdown", event => {
@@ -154,4 +220,8 @@ function togglePanel(id = "", onlyOpen = false, onlyClose = false) {
 
         dispatchEvent(new CustomEvent(panel.hidden ? "panelclose" : "panelopen", { detail: panel }));
     }
+}
+
+function showMessage(message = "") {
+    dispatchEvent(new CustomEvent("showmessage", { detail: message }));
 }

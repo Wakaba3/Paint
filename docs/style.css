@@ -94,8 +94,8 @@ html, body {
 #import,
 #export {
     pointer-events: auto;
-    text-align: center;
     padding: 5px 30px;
+    text-align: center;
     border-radius: 5px;
 }
 

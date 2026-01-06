@@ -28,7 +28,7 @@ paint.onmessage = event => {
             sizeHeight.value = event.data.height;
 
             if (event.data.successful) {
-                alert(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
+                showMessage(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
             }
 
             break;
@@ -102,13 +102,13 @@ function importImages(files = []) {
 
         if (images.length > 0) {
             if (images.length === 1) {
-                alert("画像を読み込みました");
+                showMessage("画像を読み込みました");
             } else {
-                alert(`${images.length}枚の画像を読み込みました`);
+                showMessage(`${images.length}枚の画像を読み込みました`);
             }
         }
     }).catch(error => {
-        alert("画像の読み込みに失敗しました！");
+        showMessage("画像の読み込みに失敗しました！");
     });
 }
 
