@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paint</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script defer type="text/javascript" src="popup.js"></script>
-    <script defer type="text/javascript" src="paint.js"></script>
+    <script defer type="text/javascript" src="panel.js"></script>
     <script defer type="text/javascript" src="handler.js"></script>
 </head>
 
@@ -22,8 +21,8 @@
             <div></div>
             <div></div>
             <div></div>
-            <div></div>
-            <div></div>
+            <div id="zoom-out" translate="no" onclick="zoomCanvas(-1)">−</div>
+            <div id="zoom-in" translate="no" onclick="zoomCanvas(1)">＋</div>
         </div>
         <div id="tool-bar">
             <div></div>
@@ -31,19 +30,35 @@
             <div></div>
             <div></div>
             <div></div>
-            <div></div>
-            <div></div>
-            <div id="file" onclick="openOrClosePopup('file-popup')">F</div>
+            <div id="layer" translate="no">L</div>
+            <div id="file" translate="no" onclick="togglePanel('file-panel')">F</div>
+            <div id="preference" translate="no" onclick="togglePanel('preference-panel')">P</div>
         </div>
     </div>
 
-    <div id="file-popup" class="popup" draggable>
-        <div id="import" onclick="openOrClosePopup('import-popup')">画像のインポート</div>
-        <div id="export">画像のエクスポート</div>
+    <div id="file-panel" class="panel" draggable>
+        <div id="import" onclick="togglePanel('import-panel', true)">画像の読み込み</div>
+        <div id="export">画像の保存</div>
     </div>
 
-    <div id="import-popup" class="popup" draggable>
-        <div><input id="import-chooser" type="file" accept="image/*" multiple></div>
+    <div id="import-panel" class="panel" draggable>
+        <div><input id="import-chooser" type="file" accept="image/*" multiple /></div>
+    </div>
+
+    <div id="preference-panel" class="panel" draggable>
+        <div id="size-contents">
+            <label for="size-inputs">画像のサイズ：</label>
+            <div id="size-inputs">
+                <div id="size-width-contents">
+                    <label for="size-width">幅：</label>
+                    <input id="size-width" type="number" min="1" max="65536" value="768" />
+                </div>
+                <div id="size-height-contents">
+                    <label for="size-height">高さ：</label>
+                    <input id="size-height" type="number" min="1" max="65536" value="1024" />
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 

@@ -12,9 +12,13 @@
     color: rgb(255, 255, 255);
 }
 
-body {
+html, body {
     user-select: none;
     -webkit-user-select: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -26,6 +30,7 @@ body {
     width: 95%;
     height: 95%;
     z-index: 0;
+    overflow: hidden;
 }
 
 #view {
@@ -33,11 +38,11 @@ body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    width: 100%;
+    min-width: 800px;
+    min-height: 800px;
     aspect-ratio: 1 / 1;
     z-index: 0;
-    border: thin solid var(--foreground-color);
-    border-radius: 10px;
-    background-color: var(--background-color);
 }
 
 #control-bar {
@@ -46,14 +51,17 @@ body {
     align-items: center;
     position: absolute;
     left: 50%;
-    top: 0%;
-    transform: translate(-50%, 00%);
+    top: 5%;
+    transform: translate(-50%, 0%);
     padding: 10px;
     height: 5%;
     max-width: 100%;
     max-height: 80px;
-    aspect-ratio: 12 / 1;
+    aspect-ratio: 8 / 1;
     z-index: 1;
+    border: thin solid var(--foreground-color);
+    border-radius: 10px;
+    background-color: var(--background-color);
 }
 
 #tool-bar {
@@ -62,13 +70,13 @@ body {
     align-items: center;
     position: absolute;
     left: 50%;
-    top: 100%;
+    top: 95%;
     transform: translate(-50%, -100%);
     padding: 10px;
     height: 5%;
     max-width: 100%;
     max-height: 80px;
-    aspect-ratio: 12 / 1;
+    aspect-ratio: 8 / 1;
     z-index: 2;
     border: thin solid var(--foreground-color);
     border-radius: 10px;
@@ -84,11 +92,59 @@ body {
 }
 
 #import,
-#import-chooser,
 #export {
     pointer-events: auto;
+    text-align: center;
     padding: 5px 30px;
     border-radius: 5px;
+}
+
+#import-chooser {
+    pointer-events: auto;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#size-contents {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 50px;
+    border-radius: 5px;
+}
+
+#size-contents > * {
+    flex: 1;
+}
+
+#size-inputs {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#size-inputs > * {
+    flex: 1;
+}
+
+#size-width-contents,
+#size-height-contents {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#size-width-contents > *,
+#size-height-contents > * {
+    flex: 1;
+}
+
+#size-width,
+#size-height {
+    pointer-events: auto;
+    color: black;
 }
 
 #tool-bar > div:active,

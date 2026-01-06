@@ -5,22 +5,24 @@ function setup() {
     const style = document.createElement("style");
 
     style.textContent = `
-        .popup {
+        .panel {
             pointer-events: auto;
             position: absolute;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
             padding: 1% 5%;
+            max-width: 95%;
+            max-height: 95%;
             z-index: 1;
-            overflow: hidden;
             color: white;
+            overflow: hidden;
             border: thin solid var(--foreground-color);
             border-radius: 10px;
             background-color: var(--background-color);
         }
 
-        .popup-contents {
+        .panel-contents {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -29,13 +31,13 @@ function setup() {
             z-index: 0;
         }
 
-        .popup-body {
+        .panel-body {
             flex: 1;
             padding: 10px 30px;
             z-index: 0;
         }
 
-        .popup-close {
+        .panel-close {
             pointer-events: auto;
             flex: 1;
             padding: 0px 30px;
@@ -46,7 +48,7 @@ function setup() {
             background-color: var(--background-color);
         }
 
-        .popup-close:active {
+        .panel-close:active {
             background-color: var(--foreground-color);
         }
     `;
@@ -54,45 +56,45 @@ function setup() {
     document.body.appendChild(style);
 
     //Element Modification
-    const popups = document.querySelectorAll(".popup");
+    const panels = document.querySelectorAll(".panel");
     
     let contents, body, close, onclick, children;
 
-    popups.forEach(popup => {
+    panels.forEach(panel => {
         contents = document.createElement("div");
         body = document.createElement("div");
         close = document.createElement("div");
         onclick = document.createAttribute("onclick");
         children = [];
 
-        contents.classList.add("popup-contents");
-        body.classList.add("popup-body");
-        close.classList.add("popup-close");
+        contents.classList.add("panel-contents");
+        body.classList.add("panel-body");
+        close.classList.add("panel-close");
 
         close.textContent = "Close";
-        onclick.value = "openOrClosePopup('" + popup.id + "')";
+        onclick.value = "togglePanel('" + panel.id + "')";
 
-        popup.childNodes.forEach(child => {
+        panel.childNodes.forEach(child => {
             if (child instanceof Node) {
                 children.push(child);
             }
         });
 
         close.setAttributeNode(onclick);
-        popup.hidden = true;
-        popup.textContent = "";
+        panel.hidden = true;
+        panel.textContent = "";
 
         children.forEach(child => body.appendChild(child));
         contents.appendChild(body);
         contents.appendChild(close);
-        popup.appendChild(contents);
+        panel.appendChild(contents);
     });
 
-    //Popup handling
+    //Panel handling
     const params = new Map();
 
-    popups.forEach(popup => {
-        params.set(popup, {
+    panels.forEach(panel => {
+        params.set(panel, {
             dragging: false,
             offsetX: 0,
             offsetY: 0,
@@ -104,7 +106,7 @@ function setup() {
     addEventListener("pointerdown", event => {
         const target = event.target;
 
-        if (target instanceof HTMLElement && target.classList.contains("popup") && target.hasAttribute("draggable")) {
+        if (target instanceof HTMLElement && target.classList.contains("panel") && target.hasAttribute("draggable")) {
             const param = params.get(target);
 
             param.dragging = true;
@@ -114,13 +116,13 @@ function setup() {
     });
 
     addEventListener("pointermove", event => {
-        params.forEach((params, popup) => {
+        params.forEach((params, panel) => {
             if (params.dragging) {
-                popup.style.left = (event.pageX + params.offsetX) + "px";
-                popup.style.top = (event.pageY + params.offsetY) + "px";
+                panel.style.left = (event.pageX + params.offsetX) + "px";
+                panel.style.top = (event.pageY + params.offsetY) + "px";
 
-                params.normalX = popup.offsetLeft / window.innerWidth;
-                params.normalY = popup.offsetTop / window.innerHeight;
+                params.normalX = panel.offsetLeft / window.innerWidth;
+                params.normalY = panel.offsetTop / window.innerHeight;
             }
         });
     });
@@ -130,21 +132,26 @@ function setup() {
     });
 
     window.addEventListener("resize", event => {
-        params.forEach((params, popup) => {
-            popup.style.left = (params.normalX * window.innerWidth) + "px";
-            popup.style.top = (params.normalY * window.innerHeight) + "px";
+        params.forEach((params, panel) => {
+            panel.style.left = (params.normalX * window.innerWidth) + "px";
+            panel.style.top = (params.normalY * window.innerHeight) + "px";
         });
     });
 }
 
-function openOrClosePopup(id = "") {
-    const popup = document.getElementById(id);
+function togglePanel(id = "", onlyOpen = false, onlyClose = false) {
+    const panel = document.getElementById(id);
 
-    if (popup instanceof Element) {
-        popup.hidden = !popup.hidden;
-        popup.style.left = (window.innerWidth / 2) + "px";
-        popup.style.top = (window.innerHeight / 2) + "px";
+    if (panel instanceof Element) {
+        if (onlyOpen && !panel.hidden)
+            return;
+        if (onlyClose && panel.hidden)
+            return;
 
-        dispatchEvent(new CustomEvent(popup.hidden ? "popupclose" : "popupopen", { detail: popup }));
+        panel.hidden = !panel.hidden;
+        panel.style.left = (window.innerWidth / 2) + "px";
+        panel.style.top = (window.innerHeight / 2) + "px";
+
+        dispatchEvent(new CustomEvent(panel.hidden ? "panelclose" : "panelopen", { detail: panel }));
     }
 }
