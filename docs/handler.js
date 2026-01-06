@@ -1,4 +1,4 @@
-const worker = new Worker("paint.js");
+const paint = new Worker("paint.js");
 
 const view = document.getElementById("view");
 const context = view.getContext("2d");
@@ -10,6 +10,31 @@ const sizeHeight = document.getElementById("size-height");
 
 context.imageSmoothingEnabled = false;
 
+paint.postMessage({
+    type: "init",
+    width: 1024,
+    height: 768
+});
+
+paint.onmessage = event => {
+    switch (event.data.type) {
+        case "init":
+            sizeWidth.value = event.data.width;
+            sizeHeight.value = event.data.height;
+
+            break;
+        case "resize":
+            sizeWidth.value = event.data.width;
+            sizeHeight.value = event.data.height;
+
+            if (event.data.successful) {
+                alert(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
+            }
+
+            break;
+    }
+};
+
 // Prevent right clicking
 addEventListener("contextmenu", event => event.preventDefault(), { passive: false });
 
@@ -17,13 +42,7 @@ addEventListener("contextmenu", event => event.preventDefault(), { passive: fals
 addEventListener("touchmove", event => event.preventDefault(), { passive: false });
 
 addEventListener("panelopen", event => {
-    switch (event.detail.id) {
-        case "preference-panel":
-            sizeWidth.value = canvas.width;
-            sizeHeight.value = canvas.height;
-
-            break;
-    }
+    switch (event.detail.id) {}
 })
 
 addEventListener("panelclose", event => {
@@ -103,7 +122,9 @@ function retateCanvas(angle = 0) {
 }
 
 function resizeCanvas(width = 0, height = 0) {
-    if (false) {
-        alert(`キャンバスのサイズを（幅、高さ）＝（${width}px、${height}px）に変更しました！`);
-    }
+    paint.postMessage({
+        type: "resize",
+        width: width,
+        height: height
+    });
 }

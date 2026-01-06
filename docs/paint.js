@@ -229,6 +229,9 @@ class Canvas {
 class View {
     static #RADIAN = Math.PI / 180;
 
+    #canvas;
+    #context;
+
     #objectList;
     #bindingIndex;
     #bindingObject;
@@ -237,6 +240,9 @@ class View {
     #frames;
 
     constructor() {
+        this.#canvas = new OffscreenCanvas(800, 800);
+        this.#context = this.#canvas.getContext("2d");
+
         this.#objectList = new Array();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
@@ -312,11 +318,11 @@ class View {
         this.#objectList.splice(index, 1);
     }
 
-    run(window = null, context = null) {
-        if (window instanceof Window && context instanceof CanvasRenderingContext2D) {
-            this.stop(window);
+    run(context = null) {
+        if (context instanceof CanvasRenderingContext2D) {
+            this.stop();
 
-            this.#rendering = window.setInterval(() => {
+            this.#rendering = setInterval(() => {
                 this.#render(context, this.#frames / 20);
 
                 ++this.#frames;
@@ -334,9 +340,9 @@ class View {
         }
     }
 
-    stop(window = null) {
-        if (window instanceof Window && Number.isFinite(this.#rendering)) {
-            window.clearInterval(this.#rendering);
+    stop() {
+        if (Number.isFinite(this.#rendering)) {
+            clearInterval(this.#rendering);
         }
     }
 
@@ -368,5 +374,41 @@ class View {
             return end;
 
         return start + (end - start) * step;
+    }
+}
+
+class Paint {
+    constructor(width = 0, height = 0) {
+        this.canvas = new Canvas(width, height);
+        this.view = new View();
+    }
+}
+
+let paint = null;
+
+onmessage = event => {
+    switch (event.data.type) {
+        case "init":
+            paint = new Paint(event.data.width, event.data.height);
+
+            postMessage({
+                type: "init",
+                width: paint.canvas.width,
+                height: paint.canvas.height,
+                successful: paint instanceof Paint
+            });
+
+            break;
+        case "resize":
+            paint.canvas.resize(event.data.width, event.data.height)
+
+            postMessage({
+                type: "resize",
+                width: paint.canvas.width,
+                height: paint.canvas.height,
+                successful: paint.canvas.width === event.data.width && paint.canvas.height === event.data.height
+            });
+
+            break;
     }
 }
