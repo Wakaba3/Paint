@@ -120,8 +120,6 @@ html, body {
 #size-inputs {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     gap: 10px;
 }
 
@@ -132,8 +130,6 @@ html, body {
 #size-width-contents,
 #size-height-contents {
     display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 #size-width-contents > *,
