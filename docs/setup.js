@@ -64,7 +64,7 @@ function setup() {
             z-index: 2;
             font: 125% serif;
             text-align: center;
-            overflow-wrap: break-word;
+            text-wrap: balance;
             overflow: hidden;
             border: thin solid var(--foreground-color);
             border-radius: 10px;
