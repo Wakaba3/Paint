@@ -130,6 +130,7 @@ html, body {
 #size-width-contents,
 #size-height-contents {
     display: flex;
+    align-items: center;
 }
 
 #size-width-contents > *,
