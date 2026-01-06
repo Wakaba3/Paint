@@ -1,27 +1,22 @@
 const paint = new Worker("paint.js");
 
-const view = document.getElementById("view");
-const context = view.getContext("2d");
+const view = document.getElementById("view").transferControlToOffscreen();
 
 const importChooser = document.getElementById("import-chooser");
 
 const sizeWidth = document.getElementById("size-width");
 const sizeHeight = document.getElementById("size-height");
 
-context.imageSmoothingEnabled = false;
-
 paint.postMessage({
     type: "init",
-    width: 1024,
-    height: 768
+    view: view,
+    canvasWidth: 768,
+    canvasHeight: 1024
 });
 
 paint.onmessage = event => {
     switch (event.data.type) {
         case "init":
-            sizeWidth.value = event.data.width;
-            sizeHeight.value = event.data.height;
-
             break;
         case "resize":
             sizeWidth.value = event.data.width;
@@ -30,6 +25,14 @@ paint.onmessage = event => {
             if (event.data.successful) {
                 showMessage(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
             }
+
+            break;
+        case "message":
+            showMessage(event.data.message);
+
+            break;
+        case "error":
+            throw new Error(event.data.error);
 
             break;
     }

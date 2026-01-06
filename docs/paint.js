@@ -22,8 +22,15 @@ class LayerList {
     }
 }
 
-class Buffer {
+class Frame {
     constructor(width = 0, height = 0) {
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+            postMessage({
+                type: "error",
+                error: `Invalid size: (width, height) = (${width}, ${height})`
+            });
+        }
+
         this.canvas = new OffscreenCanvas(width, height);
         this.context = this.canvas.getContext("2d", { willReadFrequently : true });
         this.context.imageSmoothingEnabled = false;
@@ -53,11 +60,8 @@ class Canvas {
     #bindingRecord;
 
     constructor(width = 0, height = 0) {
-        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0)
-            throw new Error(`Invalid size: (width, height) = (${width}, ${height})`);
-
-        this.#canvas = new Buffer(width, height);
-        this.#buffer = new Buffer(width, height);
+        this.#canvas = new Frame(width, height);
+        this.#buffer = new Frame(width, height);
 
         this.#layers = [];
         this.#lists = [];
@@ -226,11 +230,12 @@ class Canvas {
     }
 }
 
-class View {
+class Paint {
     static #RADIAN = Math.PI / 180;
 
-    #canvas;
+    #view;
     #context;
+    #canvas;
 
     #objectList;
     #bindingIndex;
@@ -239,9 +244,10 @@ class View {
     #rendering;
     #frames;
 
-    constructor() {
-        this.#canvas = new OffscreenCanvas(800, 800);
-        this.#context = this.#canvas.getContext("2d");
+    constructor(view, width, height) {
+        this.#view = view;
+        this.#context = view.getContext("2d");
+        this.#canvas = new Canvas(width, height);
 
         this.#objectList = new Array();
         this.#bindingIndex = -1;
@@ -279,21 +285,20 @@ class View {
 
     set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = null) {
         if (renderer instanceof Function) {
-            const curr = this.#objectList[index];
-            let next = curr;
+            let object = this.#objectList[index];
 
-            if (next) {
-                next.x0 = next.x1;
-                next.x1 = x;
-                next.y0 = next.y1;
-                next.y1 = y;
-                next.scale0 = next.scale1;
-                next.scale1 = scale;
-                next.angle0 = next.angle1;
-                next.angle1 = angle;
-                next.renderer = renderer ?? next.renderer;
+            if (object) {
+                object.x0 = object.x1;
+                object.x1 = x;
+                object.y0 = object.y1;
+                object.y1 = y;
+                object.scale0 = object.scale1;
+                object.scale1 = scale;
+                object.angle0 = object.angle1;
+                object.angle1 = angle;
+                object.renderer = renderer ?? object.renderer;
             } else {
-                next = {
+                object = {
                     x0: x,
                     x1: x,
                     y0: y,
@@ -307,9 +312,9 @@ class View {
             }
 
             if (index >= this.#objectList.length) {
-                this.#objectList[index] = next;
+                this.#objectList[index] = object;
             } else {
-                this.#objectList.splice(index, 1, next);
+                this.#objectList.splice(index, 1, object);
             }
         }
     }
@@ -318,26 +323,29 @@ class View {
         this.#objectList.splice(index, 1);
     }
 
-    run(context = null) {
-        if (context instanceof CanvasRenderingContext2D) {
-            this.stop();
+    run() {
+        this.stop();
 
-            this.#rendering = setInterval(() => {
-                this.#render(context, this.#frames / 20);
+        this.#rendering = setInterval(() => {
+            this.#render(this.#frames / 20);
 
-                ++this.#frames;
-                if (this.#frames >= 20) {
-                    this.#frames = 0;
+            ++this.#frames;
+            if (this.#frames >= 20) {
+                postMessage({
+                    type: "message",
+                    message: "1sec"
+                });
 
-                    this.#objectList.forEach(object => {
-                        object.x0 = object.x1;
-                        object.y0 = object.y1;
-                        object.scale0 = object.scale1;
-                        object.angle0 = object.angle1;
-                    });
-                }
-            }, 1000 / 30);
-        }
+                this.#frames = 0;
+
+                this.#objectList.forEach(object => {
+                    object.x0 = object.x1;
+                    object.y0 = object.y1;
+                    object.scale0 = object.scale1;
+                    object.angle0 = object.angle1;
+                });
+            }
+        }, 1000 / 30);
     }
 
     stop() {
@@ -346,12 +354,12 @@ class View {
         }
     }
 
-    #render(context = null, step = 1) {
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    #render(step = 1) {
+        this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
 
         this.#objectList.forEach(object => {
             object.renderer(
-                context,
+                this.#context,
                 View.#lerp(step, object.x0, object.x1),
                 View.#lerp(step, object.y0, object.y1),
                 View.#lerp(step, object.scale0, object.scale1),
@@ -360,11 +368,11 @@ class View {
         });
     }
 
-    static transform(context = null, x = 0, y = 0, scale = 1, angle = 0) {
-        context.translate(-context.canvas.width / 2, -context.canvas.height / 2);
-        context.rotate(angle * View.#RADIAN);
-        context.scale(scale, scale);
-        context.translate(x, y);
+    #transform(x = 0, y = 0, scale = 1, angle = 0) {
+        this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
+        this.#context.rotate(angle * View.#RADIAN);
+        this.#context.scale(scale, scale);
+        this.#context.translate(x, y);
     }
 
     static #lerp(step = 1, start = 0, end = 0) {
@@ -375,12 +383,13 @@ class View {
 
         return start + (end - start) * step;
     }
-}
 
-class Paint {
-    constructor(width = 0, height = 0) {
-        this.canvas = new Canvas(width, height);
-        this.view = new View();
+    get width() {
+        return this.#canvas.width;
+    }
+
+    get height() {
+        return this.#canvas.height;
     }
 }
 
@@ -389,26 +398,29 @@ let paint = null;
 onmessage = event => {
     switch (event.data.type) {
         case "init":
-            paint = new Paint(event.data.width, event.data.height);
+            paint = new Paint(event.data.view, event.data.width, event.data.height);
+            paint.run();
 
             postMessage({
                 type: "init",
-                width: paint.canvas.width,
-                height: paint.canvas.height,
+                width: paint.width,
+                height: paint.height,
                 successful: paint instanceof Paint
             });
 
             break;
         case "resize":
-            paint.canvas.resize(event.data.width, event.data.height)
+            const successful = paint.canvas.resize(event.data.width, event.data.height)
 
             postMessage({
                 type: "resize",
-                width: paint.canvas.width,
-                height: paint.canvas.height,
-                successful: paint.canvas.width === event.data.width && paint.canvas.height === event.data.height
+                width: paint.width,
+                height: paint.height,
+                successful: successful
             });
 
+            break;
+        default:
             break;
     }
 }

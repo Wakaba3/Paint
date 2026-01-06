@@ -30,22 +30,29 @@
             <div></div>
             <div></div>
             <div></div>
-            <div id="layer" translate="no">L</div>
-            <div id="file" translate="no" onclick="togglePanel('file-panel')">F</div>
+            <div id="filter" translate="no">F</div>
+            <div id="layer" translate="no" onclick="togglePanel('layer-panel')">L</div>
             <div id="preference" translate="no" onclick="togglePanel('preference-panel')">P</div>
         </div>
     </div>
 
-    <div id="file-panel" class="panel" draggable>
+    <div id="layer-panel" class="panel" draggable>
+    </div>
+
+    <div id="preference-panel" class="panel" draggable>
         <div id="import" onclick="togglePanel('import-panel', true)">画像の読み込み</div>
-        <div id="export">画像の保存</div>
+        <div id="export" onclick="togglePanel('export-panel', true)">画像の保存</div>
+        <div id="size" onclick="togglePanel('size-panel', true)">画像のサイズの変更</div>
     </div>
 
     <div id="import-panel" class="panel" draggable>
         <div><input id="import-chooser" type="file" accept="image/*" multiple /></div>
     </div>
 
-    <div id="preference-panel" class="panel" draggable>
+    <div id="export-panel" class="panel" draggable>
+    </div>
+
+    <div id="size-panel" class="panel" draggable>
         <div id="size-contents">
             <label for="size-inputs">画像のサイズ：</label>
             <div id="size-inputs">

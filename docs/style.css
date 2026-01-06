@@ -92,7 +92,8 @@ html, body {
 }
 
 #import,
-#export {
+#export,
+#size {
     pointer-events: auto;
     padding: 5px 30px;
     text-align: center;
@@ -147,7 +148,8 @@ html, body {
 #tool-bar > div:active,
 #control-bar > div:active,
 #import:active,
-#import-chooser:active,
-#export:active {
+#export:active,
+#size:active,
+#import-chooser:active {
     background-color: var(--foreground-color);
 }

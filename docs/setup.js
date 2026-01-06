@@ -12,8 +12,8 @@ function setup() {
             top: 50%;
             transform: translate(-50%, -50%);
             padding: 1% 5%;
-            max-width: 95%;
-            max-height: 95%;
+            max-width: 100%;
+            max-height: 100%;
             z-index: 1;
             overflow: hidden;
             border: thin solid var(--foreground-color);
@@ -32,7 +32,7 @@ function setup() {
 
         .panel-body {
             flex: 1;
-            padding: 10px 30px;
+            padding: 10px 10px;
             z-index: 0;
         }
 
