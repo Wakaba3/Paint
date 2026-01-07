@@ -77,15 +77,11 @@ function setup() {
 
         @keyframes message-fade-in {
             from {
-                left: 50%;
-                top: 5%;
                 transform: translate(-50%, -25%);
                 opacity: 0;
             }
 
             to {
-                left: 50%;
-                top: 5%;
                 transform: translate(-50%, 0%);
                 opacity: 1;
             }
@@ -93,15 +89,11 @@ function setup() {
 
         @keyframes message-fade-out {
             from {
-                left: 50%;
-                top: 5%;
                 transform: translate(-50%, 0%);
                 opacity: 1;
             }
 
             to {
-                left: 50%;
-                top: 5%;
                 transform: translate(-50%, -25%);
                 opacity: 0;
             }
