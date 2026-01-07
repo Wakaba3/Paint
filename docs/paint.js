@@ -277,24 +277,10 @@ class Paint {
         this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
 
         // Canvas renderer
-        this.set(1, 0, 0, 1, 0, (x, y, scale, angle) => {
-            this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
-            this.#context.rotate(angle * Paint.#RADIAN);
-            this.#context.scale(scale, scale);
-            this.#context.translate(x, y);
-            this.#context.drawImage(this.#layers, 0, 0);
-            this.#context.resetTransform();
-        });
+        this.set(1, 0, 0, 1, 0, this.#layers);
 
         //Grid renderer
-        this.set(2, 0, 0, 1, 0, () => {
-            this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
-            this.#context.rotate(angle * Paint.#RADIAN);
-            this.#context.scale(scale, scale);
-            this.#context.translate(x, y);
-            this.#context.drawImage(this.#grid, 0, 0);
-            this.#context.resetTransform();
-        });
+        this.set(2, 0, 0, 1, 0, this.#grid);
     }
 
     #bind(index = 0) {
@@ -331,41 +317,52 @@ class Paint {
     }
 
     set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = null) {
-        if (renderer instanceof Function) {
-            let object = this.#objectList[index];
+        if (!(renderer instanceof Function)) {
+            const image = renderer;
 
-            if (object) {
-                object.x0 = object.x1;
-                object.x1 = x;
-                object.y0 = object.y1;
-                object.y1 = y;
-                object.scale0 = object.scale1;
-                object.scale1 = scale;
-                object.angle0 = object.angle1;
-                object.angle1 = angle;
-                object.renderer = renderer ?? object.renderer;
-            } else {
-                object = {
-                    x0: x,
-                    x1: x,
-                    y0: y,
-                    y1: y,
-                    scale0: scale,
-                    scale1: scale,
-                    angle0: angle,
-                    angle1: angle,
-                    renderer: renderer
-                };
-            }
-
-            if (index >= this.#objectList.length) {
-                this.#objectList[index] = object;
-            } else {
-                this.#objectList.splice(index, 1, object);
-            }
-
-            this.repaint();
+            renderer = (x, y, scale, angle) => {
+                this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
+                this.#context.rotate(angle * Paint.#RADIAN);
+                this.#context.scale(scale, scale);
+                this.#context.translate(x, y);
+                this.#context.drawImage(image, 0, 0);
+                this.#context.resetTransform();
+            };
         }
+
+        let object = this.#objectList[index];
+
+        if (object) {
+            object.x0 = object.x1;
+            object.x1 = x;
+            object.y0 = object.y1;
+            object.y1 = y;
+            object.scale0 = object.scale1;
+            object.scale1 = scale;
+            object.angle0 = object.angle1;
+            object.angle1 = angle;
+            object.renderer = renderer ?? object.renderer;
+        } else {
+            object = {
+                x0: x,
+                x1: x,
+                y0: y,
+                y1: y,
+                scale0: scale,
+                scale1: scale,
+                angle0: angle,
+                angle1: angle,
+                renderer: renderer
+            };
+        }
+
+        if (index >= this.#objectList.length) {
+            this.#objectList[index] = object;
+        } else {
+            this.#objectList.splice(index, 1, object);
+        }
+
+        this.repaint();
     }
 
     remove(index = 0) {
