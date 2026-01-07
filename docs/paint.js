@@ -451,11 +451,6 @@ class Paint {
         const columns = (this.#view.width - 1) / width;
         const rows = (this.#view.height - 1) / height;
 
-        postMessage({
-            type: "message",
-            message: `グリッド（幅、高さ）＝（${width}、${height}）をロードしました！`
-        });
-
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
@@ -480,6 +475,11 @@ class Paint {
         this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
 
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        postMessage({
+            type: "message",
+            message: `グリッド（幅、高さ）＝（${width}、${height}）をロードしました！`
+        });
 
         this.repaint();
     }
