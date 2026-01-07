@@ -15,14 +15,14 @@
         <canvas id="view" width="800" height="800"></canvas>
 
         <div id="control-bar">
+            <div id="undo" translate="no">U</div>
+            <div id="redo" translate="no">R</div>
             <div></div>
+            <div id="rotate-left" translate="no">L</div>
+            <div id="rotate-right" translate="no">R</div>
             <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div id="zoom-out" translate="no" onclick="zoomCanvas(-1)">−</div>
-            <div id="zoom-in" translate="no" onclick="zoomCanvas(1)">＋</div>
+            <div id="zoom-out" translate="no" onclick="scaleCanvas(-1)">−</div>
+            <div id="zoom-in" translate="no" onclick="scaleCanvas(1)">＋</div>
         </div>
         <div id="tool-bar">
             <div></div>
