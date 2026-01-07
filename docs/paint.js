@@ -410,8 +410,8 @@ class Paint {
         const vns = (this.#view.width - 1) / width;
         const hns = (this.#view.height - 1) / height;
 
-        for (const j = 0; j <= hns; ++j) {
-            for (const i = 0; i <= vns; ++i) {
+        for (let j = 0; j <= hns; ++j) {
+            for (let i = 0; i <= vns; ++i) {
                 this.#buffer.context.moveTo((i + 1) * width - 1, j * height);
                 this.#buffer.context.lineTo(i * width, j * height);
                 this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
