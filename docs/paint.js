@@ -456,6 +456,7 @@ class Paint {
         this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
         this.#buffer.context.lineWidth = 1;
         this.#buffer.context.beginPath();
+        this.#buffer.translate(0.5, 0.5);
 
         for (let j = 0; j <= columns; ++j) {
             for (let i = 0; i <= rows; ++i) {
@@ -468,8 +469,9 @@ class Paint {
         this.#buffer.context.moveTo(0, this.#view.height - 1);
         this.#buffer.context.lineTo(this.#view.width - 1, this.#view.height - 1);
         this.#buffer.context.lineTo(this.#view.width - 1, 0);
-
         this.#buffer.context.stroke();
+        this.#buffer.context.resetTransform();
+
         this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
 
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
