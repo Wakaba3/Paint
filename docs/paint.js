@@ -252,6 +252,7 @@ class Paint {
 
     #background;
     #layers;
+    #grid;
 
     #renderer;
     #repaint;
@@ -268,8 +269,9 @@ class Paint {
 
         this.#repaint = true;
 
-        this.setBackground();
+        this.setBackground(64, 0, 0, 255);
         this.setLayers();
+        this.setGrid(64, 64, 128, 128, 128, 255);
 
         // Background renderer
         this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
@@ -281,6 +283,16 @@ class Paint {
             this.#context.scale(scale, scale);
             this.#context.translate(x, y);
             this.#context.drawImage(this.#layers, 0, 0);
+            this.#context.resetTransform();
+        });
+
+        //Grid renderer
+        this.set(2, 0, 0, 1, 0, () => {
+            this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
+            this.#context.rotate(angle * Paint.#RADIAN);
+            this.#context.scale(scale, scale);
+            this.#context.translate(x, y);
+            this.#context.drawImage(this.#grid, 0, 0);
             this.#context.resetTransform();
         });
     }
@@ -382,6 +394,33 @@ class Paint {
             this.#layers.close();
 
         this.#layers = this.#canvas.composite();
+
+        this.repaint();
+    }
+
+    setGrid(width = 64, height = 64, red = 64, green = 64, blue = 64, alpha = 64) {
+        if (this.#grid)
+            this.#grid.close();
+
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+        this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+        this.#buffer.context.lineWidth = 1;
+        this.#buffer.context.beginPath();
+
+        const vns = (this.#view.width - 1) / width;
+        const hns = (this.#view.height - 1) / height;
+
+        for (const j = 0; j <= hns; ++j) {
+            for (const i = 0; i <= vns; ++i) {
+                this.#buffer.context.moveTo((i + 1) * width - 1, j * height);
+                this.#buffer.context.lineTo(i * width, j * height);
+                this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
+            }
+        }
+
+        this.#buffer.context.stroke();
+        this.#grid = this.#buffer.canvas.transferToImageBitmap();
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.repaint();
     }
