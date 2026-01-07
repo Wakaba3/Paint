@@ -345,7 +345,7 @@ class Paint {
                     object.angle0 = object.angle1;
                 });
             }
-        }, 1000 / 20);
+        }, 1000 / 30);
     }
 
     stop() {
