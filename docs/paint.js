@@ -280,23 +280,23 @@ class Paint {
 
         this.#repaint = true;
 
-        this.loadBackground(0, 0, 0, 0);
-        this.loadLayers();
-        this.loadGrid(255, 255, 255, 64);
-
         // Background renderer
         this.#background = this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#backgroundBuffer, 0, 0));
 
         // layer renderer
-        this.#layers = this.set(10, 0, 0, 1, 0, this.#layersBuffer);
+        this.#layers = this.set(10, 0, 0, 1, 0, this.#createImageRenderer(this.#layersBuffer));
 
         //Grid renderer
-        this.#grid = this.set(20, 0, 0, 1, 0, this.#gridBuffer);
+        this.#grid = this.set(20, 0, 0, 1, 0, this.#createImageRenderer(this.#gridBuffer));
+
+        this.#loadBackground(0, 0, 0, 0);
+        this.#loadLayers();
+        this.#loadGrid(255, 255, 255, 64);
     }
 
     resize(width = 0, height = 0) {
         if (this.#canvas.resize(width, height)) {
-            this.loadGrid(255, 255, 255, 64);
+            this.#loadGrid(255, 255, 255, 64);
 
             return true;
         }
@@ -350,20 +350,7 @@ class Paint {
         };
     }
 
-    set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = null) {
-        if (renderer && !(renderer instanceof Function)) {
-            const image = renderer;
-
-            renderer = (x, y, scale, angle) => {
-                this.#context.translate(this.#offsetX, this.#offsetY);
-                this.#context.rotate(angle * Paint.#RADIAN);
-                this.#context.scale(scale, scale);
-                this.#context.translate(x - this.#offsetX, y - this.#offsetY);
-                this.#context.drawImage(image, 0, 0);
-                this.#context.resetTransform();
-            };
-        }
-
+    set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = () => {}) {
         let object = this.#objectList[index];
 
         if (object) {
@@ -395,63 +382,6 @@ class Paint {
 
     remove(index = 0) {
         this.#objectList.splice(index, 1);
-
-        this.repaint();
-    }
-
-    loadBackground(red = 0, green = 0, blue = 0, alpha = 0) {
-        if (this.#backgroundBuffer)
-            this.#backgroundBuffer.close();
-
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-
-        this.#buffer.context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-        this.#buffer.context.fillRect(0, 0, this.#buffer.width, this.#buffer.height);
-        this.#backgroundBuffer = this.#buffer.canvas.transferToImageBitmap();
-
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-
-        this.repaint();
-    }
-
-    loadLayers() {
-        if (this.#layersBuffer)
-            this.#layersBuffer.close();
-
-        this.#layersBuffer = this.#canvas.composite();
-
-        this.repaint();
-    }
-
-    loadGrid(red = 0, green = 0, blue = 0, alpha = 0) {
-        if (this.#gridBuffer)
-            this.#gridBuffer.close();
-
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-        this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-        this.#buffer.context.lineWidth = 1;
-        this.#buffer.context.beginPath();
-
-        const width = 64 / this.#layers.scale;
-        const height = 64 / this.#layers.scale;
-        const columns = (this.#view.width - 1) / width;
-        const rows = (this.#view.height - 1) / height;
-
-        for (let j = 0; j <= columns; ++j) {
-            for (let i = 0; i <= rows; ++i) {
-                this.#buffer.context.moveTo((i + 1) * width - 1, j * height);
-                this.#buffer.context.lineTo(i * width, j * height);
-                this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
-            }
-        }
-
-        this.#buffer.context.moveTo(0, this.#view.height - 1);
-        this.#buffer.context.lineTo(this.#view.width - 1, this.#view.height - 1);
-        this.#buffer.context.lineTo(this.#view.width - 1, 0);
-
-        this.#buffer.context.stroke();
-        this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.repaint();
     }
@@ -489,6 +419,74 @@ class Paint {
 
     get height() {
         return this.#canvas.height;
+    }
+
+    #loadBackground(red = 0, green = 0, blue = 0, alpha = 0) {
+        if (this.#backgroundBuffer)
+            this.#backgroundBuffer.close();
+
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        this.#buffer.context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+        this.#buffer.context.fillRect(0, 0, this.#buffer.width, this.#buffer.height);
+        this.#backgroundBuffer = this.#buffer.canvas.transferToImageBitmap();
+
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        this.repaint();
+    }
+
+    #loadLayers() {
+        if (this.#layersBuffer)
+            this.#layersBuffer.close();
+
+        this.#layersBuffer = this.#canvas.composite();
+
+        this.repaint();
+    }
+
+    #loadGrid(red = 0, green = 0, blue = 0, alpha = 0) {
+        if (this.#gridBuffer)
+            this.#gridBuffer.close();
+
+        const width = 64 / this.#layers.scale;
+        const height = 64 / this.#layers.scale;
+        const columns = (this.#view.width - 1) / width;
+        const rows = (this.#view.height - 1) / height;
+
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+        this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+        this.#buffer.context.lineWidth = 1;
+        this.#buffer.context.beginPath();
+
+        for (let j = 0; j <= columns; ++j) {
+            for (let i = 0; i <= rows; ++i) {
+                this.#buffer.context.moveTo((i + 1) * width - 1, j * height);
+                this.#buffer.context.lineTo(i * width, j * height);
+                this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
+            }
+        }
+
+        this.#buffer.context.moveTo(0, this.#view.height - 1);
+        this.#buffer.context.lineTo(this.#view.width - 1, this.#view.height - 1);
+        this.#buffer.context.lineTo(this.#view.width - 1, 0);
+
+        this.#buffer.context.stroke();
+        this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        this.repaint();
+    }
+
+    #createImageRenderer(image) {
+        return (x, y, scale, angle) => {
+            this.#context.translate(this.#offsetX, this.#offsetY);
+            this.#context.rotate(angle * Paint.#RADIAN);
+            this.#context.scale(scale, scale);
+            this.#context.translate(x - this.#offsetX, y - this.#offsetY);
+            this.#context.drawImage(image, 0, 0);
+            this.#context.resetTransform();
+        }
     }
 }
 
