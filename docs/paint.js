@@ -283,10 +283,10 @@ class Paint {
         this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
 
         // Canvas renderer
-        this.set(1, 0, 0, 1, 0, this.#layers);
+        this.set(10, 0, 0, 1, 0, this.#layers);
 
         //Grid renderer
-        this.set(2, 0, 0, 1, 0, this.#grid);
+        this.set(20, 0, 0, 1, 0, this.#grid);
     }
 
     resize(width = 0, height = 0) {
@@ -300,7 +300,7 @@ class Paint {
         }
     }
 
-    move(index = 0, dx = 0, dy = 0) {
+    translate(index = 0, dx = 0, dy = 0) {
         this.#bind(index);
 
         this.#bindingObject.x1 += dx;
@@ -309,18 +309,18 @@ class Paint {
         this.repaint();
     }
 
-    scale(index = 0, dScale = 0) {
+    scale(index = 0, power = 0) {
         this.#bind(index);
 
-        this.#bindingObject.scale1 *= 2 ** dScale;
+        this.#bindingObject.scale1 *= 2 ** power;
 
         this.repaint();
     }
 
-    angle(index = 0, dAngle = 0) {
+    rotate(index = 0, angle = 0) {
         this.#bind(index);
 
-        this.#bindingObject.angle1 += dAngle;
+        this.#bindingObject.angle1 += angle;
         this.#bindingObject.angle1 %= 360;
 
         this.repaint();
@@ -502,6 +502,27 @@ class Paint {
 let paint = null;
 
 onmessage = event => {
+    event.data.type = String(event.data.type);
+
+    if (event.data.type === "init") {
+        paint = new Paint(event.data.view, event.data.width, event.data.height);
+        paint.run();
+
+        postMessage({
+            type: "init",
+            width: paint.width,
+            height: paint.height,
+            successful: paint instanceof Paint
+        });
+    } else if (!paint) {
+        postMessage({
+            type: "error",
+            error: "Paint is not initialized!"
+        });
+
+        return;
+    }
+
     switch (event.data.type) {
         case "init":
             paint = new Paint(event.data.view, event.data.width, event.data.height);
@@ -524,6 +545,30 @@ onmessage = event => {
                 height: paint.height,
                 successful: successful
             });
+
+            break;
+        case "translate":
+            if (event.data.index instanceof Array) {
+                event.data.index.forEach(index => paint.translate(index, event.data.dx, event.data.dy));
+            } else {
+                paint.translate(event.data.index, event.data.dx, event.data.dy);
+            }
+
+            break;
+        case "scale":
+            if (event.data.index instanceof Array) {
+                event.data.index.forEach(index => paint.scale(index, event.data.power));
+            } else {
+                paint.scale(event.data.index, event.data.power);
+            }
+
+            break;
+        case "ratote":
+            if (event.data.index instanceof Array) {
+                event.data.index.forEach(index => paint.rotate(index, event.data.angle));
+            } else {
+                paint.rotate(event.data.index, event.data.angle);
+            }
 
             break;
         default:

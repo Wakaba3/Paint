@@ -8,6 +8,8 @@ const importChooser = document.getElementById("import-chooser");
 const sizeWidth = document.getElementById("size-width");
 const sizeHeight = document.getElementById("size-height");
 
+const keys = new Set();
+
 paint.postMessage({
     type: "init",
     view: view,
@@ -68,36 +70,27 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("keydown", event => {
-    switch (event.key) {
-        case "d":
-        case "ArrowRight":
-            moveCanvas(180, 10);
-            
-            break;
-        case "w":
-        case "ArrowTop":
-            moveCanvas(90, 10);
+    keys.add(event.key);
 
-            break;
-        case "a":
-        case "ArrowLeft":
-            moveCanvas(0, 10);
+    let dx = 0, dy = 0, length;
 
-            break;
-        case "s":
-        case "ArrowDown":
-            moveCanvas(-90, 10);
+    if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
+        dx += 1;
+    if (keys.has("w") || keys.has("W") || keys.has("ArrowUp"))
+        dy -= 1;
+    if (keys.has("a") || keys.has("A") || keys.has("ArrowLeft"))
+        dx -= 1;
+    if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
+        dy += 1;
 
-            break;
-        case "-":
-            zoomCanvas(-1);
+    length = Math.sqrt(dx * dx + dy * dy);
 
-            break;
-        case "+":
-            zoomCanvas(1);
+    if (length > 0)
+        translateCanvas(dx / length, dy / length);
+});
 
-            break;
-    }
+addEventListener("keyup", event => {
+    keys.delete(event.key);
 });
 
 function importImages(files = []) {
@@ -121,19 +114,35 @@ function importImages(files = []) {
     });
 }
 
-function moveCanvas(angle = 0, velocity = 0) {
-}
-
-function zoomCanvas(step = 0) {
-}
-
-function retateCanvas(angle = 0) {
-}
-
 function resizeCanvas(width = 0, height = 0) {
     paint.postMessage({
         type: "resize",
         width: width,
         height: height
+    });
+}
+
+function translateCanvas(dx = 0, dy = 0) {
+    paint.postMessage({
+        type: "translate",
+        index: [10, 20],
+        dx: dx,
+        dy: dy
+    });
+}
+
+function scaleCanvas(power = 0) {
+    paint.postMessage({
+        type: "scale",
+        index: [10, 20],
+        power: power
+    });
+}
+
+function rotateCanvas(angle = 0) {
+    paint.postMessage({
+        type: "rotate",
+        index: [10, 20],
+        angle: angle
     });
 }
