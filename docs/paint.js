@@ -303,8 +303,8 @@ class Paint {
     translate(index = 0, dx = 0, dy = 0) {
         this.#bind(index);
 
-        this.#bindingObject.x += dx;
-        this.#bindingObject.y += dy;
+        this.#bindingObject.x += dx * this.#bindingObject.scale;
+        this.#bindingObject.y += dy * this.#bindingObject.scale;
 
         this.repaint();
     }
