@@ -175,6 +175,7 @@ function setup() {
 
         message.classList.add("message");
         message.textContent = event.detail;
+        message.style.top = (10 + (messages.size % 11) * 10) + "px";
 
         document.body.appendChild(message);
 
