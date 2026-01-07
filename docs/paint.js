@@ -324,7 +324,7 @@ class Paint {
                 this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
                 this.#context.rotate(angle * Paint.#RADIAN);
                 this.#context.scale(scale, scale);
-                this.#context.translate(x + this.#view.width / 2, y + this.#view.height / 2);
+                this.#context.translate(x, y);
                 this.#context.drawImage(image, 0, 0);
                 this.#context.resetTransform();
             };
