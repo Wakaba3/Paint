@@ -328,13 +328,13 @@ class Paint {
         this.#renderer = setInterval(() => {
             this.#render(frames / 20);
 
+            postMessage({
+                type: "message",
+                message: `frames: ${frames}`
+            });
+
             ++frames;
             if (frames >= 20) {
-                postMessage({
-                    type: "message",
-                    message: "0.05sec"
-                });
-
                 frames = 0;
 
                 this.#objectList.forEach(object => {
