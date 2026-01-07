@@ -83,9 +83,9 @@ addEventListener("keydown", event => {
     if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
         dy -= 1;
     if (keys.has("+"))
-        dScl += 1;
+        dScl += 0.5;
     if (keys.has("-"))
-        dScl -= 1;
+        dScl -= 0.5;
 
     if (dx !== 0 || dy !== 0) {
         const length = Math.sqrt(dx * dx + dy * dy);
