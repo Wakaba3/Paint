@@ -332,7 +332,7 @@ class Paint {
             if (frames >= 20) {
                 postMessage({
                     type: "message",
-                    message: "1sec"
+                    message: "0.05sec"
                 });
 
                 frames = 0;
