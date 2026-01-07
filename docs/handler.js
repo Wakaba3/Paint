@@ -1,6 +1,7 @@
 const paint = new Worker("paint.js");
 
-const view = document.getElementById("view").transferControlToOffscreen();
+const canvas = document.getElementById("view");
+const view = canvas.transferControlToOffscreen();
 
 const importChooser = document.getElementById("import-chooser");
 
