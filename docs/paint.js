@@ -303,10 +303,8 @@ class Paint {
     translate(index = 0, dx = 0, dy = 0) {
         this.#bind(index);
 
-        this.#bindingObject.x0 = this.#bindingObject.x1;
-        this.#bindingObject.y0 = this.#bindingObject.y1;
-        this.#bindingObject.x1 += dx;
-        this.#bindingObject.y1 += dy;
+        this.#bindingObject.x += dx;
+        this.#bindingObject.y += dy;
 
         this.repaint();
     }
@@ -314,8 +312,7 @@ class Paint {
     scale(index = 0, power = 0) {
         this.#bind(index);
 
-        this.#bindingObject.scale0 = this.#bindingObject.scale1;
-        this.#bindingObject.scale1 *= 2 ** power;
+        this.#bindingObject.scale *= 2 ** power;
 
         this.repaint();
     }
@@ -323,9 +320,8 @@ class Paint {
     rotate(index = 0, angle = 0) {
         this.#bind(index);
 
-        this.#bindingObject.angle0 = this.#bindingObject.angle1;
-        this.#bindingObject.angle1 += angle;
-        this.#bindingObject.angle1 %= 360;
+        this.#bindingObject.angle += angle;
+        this.#bindingObject.angle %= 360;
 
         this.repaint();
     }
@@ -347,25 +343,17 @@ class Paint {
         let object = this.#objectList[index];
 
         if (object) {
-            object.x0 = object.x1;
-            object.x1 = x;
-            object.y0 = object.y1;
-            object.y1 = y;
-            object.scale0 = object.scale1;
-            object.scale1 = scale;
-            object.angle0 = object.angle1;
-            object.angle1 = angle;
+            object.x = x;
+            object.y = y;
+            object.scale = scale;
+            object.angle = angle;
             object.renderer = renderer ?? object.renderer;
         } else {
             object = {
-                x0: x,
-                x1: x,
-                y0: y,
-                y1: y,
-                scale0: scale,
-                scale1: scale,
-                angle0: angle,
-                angle1: angle,
+                x: x,
+                y: y,
+                scale: scale,
+                angle: angle,
                 renderer: renderer
             };
         }
@@ -439,20 +427,11 @@ class Paint {
     run() {
         this.stop();
 
-        let frames = 0;
-
         this.#renderer = setInterval(() => {
             if (this.#repaint) {
-                if (frames >= 20) {
-                    this.#repaint = false;
-                    frames = 0;
+                this.#render();
 
-                    this.#render(1);
-                } else {
-                    this.#render(frames / 20);
-                }
-
-                ++frames;
+                this.#repaint = false;
             }
         }, 1000 / 30);
     }
@@ -463,30 +442,13 @@ class Paint {
         }
     }
 
-    #render(step = 1) {
+    #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
-
-        this.#objectList.forEach(object => {
-            object.renderer(
-                Paint.#lerp(step, object.x0, object.x1),
-                Paint.#lerp(step, object.y0, object.y1),
-                Paint.#lerp(step, object.scale0, object.scale1),
-                Paint.#lerp(step, object.angle0, object.angle1)
-            );
-        });
+        this.#objectList.forEach(object => object.renderer(object.x, object.y, object.scale, object.angle));
     }
 
     repaint() {
         this.#repaint = true;
-    }
-
-    static #lerp(step = 1, start = 0, end = 0) {
-        if (step === 0)
-            return start;
-        if (step === 1)
-            return end;
-
-        return start + (end - start) * step;
     }
 
     get width() {
