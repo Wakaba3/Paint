@@ -424,9 +424,6 @@ class Paint {
     }
 
     loadGrid(red = 0, green = 0, blue = 0, alpha = 0) {
-        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0)
-            return;
-
         if (this.#gridBuffer)
             this.#gridBuffer.close();
 
