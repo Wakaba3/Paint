@@ -286,7 +286,13 @@ class Paint {
 
         //Grid renderer
         this.#loadGrid(255, 255, 255, 64);
-        this.set(20, 0, 0, 1, 0, this.#createImageRenderer(this.#gridBuffer));
+        this.set(20, 0, 0, 1, 0, (x, y, scale, angle) => {
+            this.#context.translate(this.#offsetX, this.#offsetY);
+            this.#context.rotate(angle * Paint.#RADIAN);
+            this.#context.translate(x - this.#offsetX, y - this.#offsetY);
+            this.#context.drawImage(this.#gridBuffer, 0, 0);
+            this.#context.resetTransform();
+        });
     }
 
     resize(width = 0, height = 0) {
