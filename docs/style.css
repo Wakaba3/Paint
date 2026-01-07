@@ -30,7 +30,6 @@ html, body {
     width: 95%;
     height: 95%;
     z-index: 0;
-    overflow: hidden;
 }
 
 #view {
@@ -38,12 +37,10 @@ html, body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
-    max-width: 800px;
+    height: 125%;
+    max-height: 800px;
     aspect-ratio: 1 / 1;
     z-index: 0;
-    border: thin solid var(--foreground-color);
-    border-radius: 10px;
 }
 
 #control-bar {

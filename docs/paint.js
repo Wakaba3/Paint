@@ -286,7 +286,7 @@ class Paint {
         this.set(1, 0, 0, 1, 0, this.#layers);
 
         //Grid renderer
-        this.set(2, 0, 0, 1, 30, this.#grid);
+        this.set(2, 0, 0, 1, 0, this.#grid);
     }
 
     #bind(index = 0) {
