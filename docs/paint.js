@@ -289,6 +289,10 @@ class Paint {
         this.set(2, 0, 0, 1, 0, this.#grid);
     }
 
+    resize(width = 0, height = 0) {
+        return this.#canvas.resize(width, height);
+    }
+
     #bind(index = 0) {
         if (index !== this.#bindingIndex) {
             this.#bindingIndex = index;
@@ -512,7 +516,7 @@ onmessage = event => {
 
             break;
         case "resize":
-            const successful = paint.canvas.resize(event.data.width, event.data.height)
+            const successful = paint.resize(event.data.width, event.data.height)
 
             postMessage({
                 type: "resize",
