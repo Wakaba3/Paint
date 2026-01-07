@@ -75,13 +75,13 @@ addEventListener("keydown", event => {
     let dx = 0, dy = 0, length;
 
     if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
-        dx += 1;
-    if (keys.has("w") || keys.has("W") || keys.has("ArrowUp"))
-        dy -= 1;
-    if (keys.has("a") || keys.has("A") || keys.has("ArrowLeft"))
         dx -= 1;
-    if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
+    if (keys.has("w") || keys.has("W") || keys.has("ArrowUp"))
         dy += 1;
+    if (keys.has("a") || keys.has("A") || keys.has("ArrowLeft"))
+        dx += 1;
+    if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
+        dy -= 1;
 
     length = Math.sqrt(dx * dx + dy * dy);
 
