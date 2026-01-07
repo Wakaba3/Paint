@@ -461,7 +461,7 @@ class Paint {
         this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
         this.#buffer.context.lineWidth = 1;
         this.#buffer.context.beginPath();
-        this.#buffer.translate(0.5, 0.5);
+        this.#buffer.context.translate(0.5, 0.5);
 
         for (let j = 0; j <= columns; ++j) {
             for (let i = 0; i <= rows; ++i) {
