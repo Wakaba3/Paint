@@ -385,7 +385,7 @@ class Paint {
         this.repaint();
     }
 
-    setBackground(red = 32, green = 32, blue = 32, alpha = 255) {
+    setBackground(red = 0, green = 0, blue = 0, alpha = 255) {
         if (this.#background)
             this.#background.close();
 
