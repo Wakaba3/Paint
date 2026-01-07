@@ -303,6 +303,8 @@ class Paint {
     translate(index = 0, dx = 0, dy = 0) {
         this.#bind(index);
 
+        this.#bindingObject.x0 = this.#bindingObject.x1;
+        this.#bindingObject.y0 = this.#bindingObject.y1;
         this.#bindingObject.x1 += dx;
         this.#bindingObject.y1 += dy;
 
@@ -312,6 +314,7 @@ class Paint {
     scale(index = 0, power = 0) {
         this.#bind(index);
 
+        this.#bindingObject.scale0 = this.#bindingObject.scale1;
         this.#bindingObject.scale1 *= 2 ** power;
 
         this.repaint();
@@ -320,6 +323,7 @@ class Paint {
     rotate(index = 0, angle = 0) {
         this.#bind(index);
 
+        this.#bindingObject.angle0 = this.#bindingObject.angle1;
         this.#bindingObject.angle1 += angle;
         this.#bindingObject.angle1 %= 360;
 
@@ -438,22 +442,14 @@ class Paint {
         let frames = 0;
 
         this.#renderer = setInterval(() => {
+            if (this.#repaint)
+                this.#render(frames / 20);
+
             ++frames;
             if (frames >= 20) {
                 frames = 0;
 
-                this.#objectList.forEach(object => {
-                    object.x0 = object.x1;
-                    object.y0 = object.y1;
-                    object.scale0 = object.scale1;
-                    object.angle0 = object.angle1;
-                });
-
-                this.#render();
-
                 this.#repaint = false;
-            } else if (this.#repaint) {
-                this.#render(frames / 20);
             }
         }, 1000 / 30);
     }
