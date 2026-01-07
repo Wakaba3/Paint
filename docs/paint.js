@@ -45,6 +45,14 @@ class Frame {
 
         return true;
     }
+
+    get width() {
+        return this.canvas.width;
+    }
+
+    get height() {
+        return this.canvas.height;
+    }
 }
 
 class Canvas {
@@ -222,11 +230,11 @@ class Canvas {
     }
 
     get width() {
-        return this.#canvas.canvas.width;
+        return this.#canvas.width;
     }
 
     get height() {
-        return this.#canvas.canvas.height;
+        return this.#canvas.height;
     }
 }
 
@@ -236,21 +244,45 @@ class Paint {
     #view;
     #context;
     #canvas;
+    #buffer;
 
     #objectList;
     #bindingIndex;
     #bindingObject;
 
+    #background;
+    #layers;
+
     #renderer;
+    #repaint;
 
     constructor(view, width, height) {
         this.#view = view;
         this.#context = view.getContext("2d");
         this.#canvas = new Canvas(width, height);
+        this.#buffer = new Frame(view.width, view.height);
 
         this.#objectList = new Array();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
+
+        this.#repaint = true;
+
+        this.setBackground();
+        this.setLayers();
+
+        // Background renderer
+        this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
+
+        // Canvas renderer
+        this.set(1, 0, 0, 1, 0, (x, y, scale, angle) => {
+            this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
+            this.#context.rotate(angle * Paint.#RADIAN);
+            this.#context.scale(scale, scale);
+            this.#context.translate(x, y);
+            this.#context.drawImage(this.#layers, 0, 0);
+            this.#context.resetTransform();
+        });
     }
 
     #bind(index = 0) {
@@ -265,12 +297,16 @@ class Paint {
 
         this.#bindingObject.x1 += dx;
         this.#bindingObject.y1 += dy;
+
+        this.repaint();
     }
 
     scale(index = 0, dScale = 0) {
         this.#bind(index);
 
         this.#bindingObject.scale1 *= 2 ** dScale;
+
+        this.repaint();
     }
 
     angle(index = 0, dAngle = 0) {
@@ -278,6 +314,8 @@ class Paint {
 
         this.#bindingObject.angle1 += dAngle;
         this.#bindingObject.angle1 %= 360;
+
+        this.repaint();
     }
 
     set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = null) {
@@ -313,11 +351,39 @@ class Paint {
             } else {
                 this.#objectList.splice(index, 1, object);
             }
+
+            this.repaint();
         }
     }
 
     remove(index = 0) {
         this.#objectList.splice(index, 1);
+
+        this.repaint();
+    }
+
+    setBackground(red = 0, green = 0, blue = 0, alpha = 0) {
+        if (this.#background)
+            this.#background.close();
+
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        this.#buffer.context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+        this.#buffer.context.fillRect(0, 0, this.#buffer.width, this.#buffer.height);
+        this.#background = this.#buffer.canvas.transferToImageBitmap();
+
+        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        this.repaint();
+    }
+
+    setLayers() {
+        if (this.#layers)
+            this.#layers.close();
+
+        this.#layers = this.#canvas.composite();
+
+        this.repaint();
     }
 
     run() {
@@ -326,13 +392,6 @@ class Paint {
         let frames = 0;
 
         this.#renderer = setInterval(() => {
-            this.#render(frames / 20);
-
-            postMessage({
-                type: "message",
-                message: `frames: ${frames}`
-            });
-
             ++frames;
             if (frames >= 20) {
                 frames = 0;
@@ -343,6 +402,12 @@ class Paint {
                     object.scale0 = object.scale1;
                     object.angle0 = object.angle1;
                 });
+
+                this.#render();
+
+                this.#repaint = false;
+            } else if (this.#repaint) {
+                this.#render(frames / 20);
             }
         }, 1000 / 30);
     }
@@ -358,7 +423,6 @@ class Paint {
 
         this.#objectList.forEach(object => {
             object.renderer(
-                this.#context,
                 View.#lerp(step, object.x0, object.x1),
                 View.#lerp(step, object.y0, object.y1),
                 View.#lerp(step, object.scale0, object.scale1),
@@ -367,11 +431,8 @@ class Paint {
         });
     }
 
-    #transform(x = 0, y = 0, scale = 1, angle = 0) {
-        this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
-        this.#context.rotate(angle * View.#RADIAN);
-        this.#context.scale(scale, scale);
-        this.#context.translate(x, y);
+    repaint() {
+        this.#repaint = true;
     }
 
     static #lerp(step = 1, start = 0, end = 0) {

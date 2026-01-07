@@ -46,7 +46,12 @@ addEventListener("contextmenu", event => event.preventDefault(), { passive: fals
 addEventListener("touchmove", event => event.preventDefault(), { passive: false });
 
 addEventListener("panelopen", event => {
-    switch (event.detail.id) {}
+    switch (event.detail.id) {
+        case "import-panel":
+            importChooser.value = null;
+
+            break;
+    }
 })
 
 addEventListener("panelclose", event => {

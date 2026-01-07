@@ -105,29 +105,33 @@ function setup() {
     //Element Modification
     const panels = document.querySelectorAll(".panel");
 
-    let contents, body, close, onclick, children;
+    let onclick, contents, body, close, children;
 
     panels.forEach(panel => {
-        contents = document.createElement("div");
-        body = document.createElement("div");
-        close = document.createElement("div");
         onclick = document.createAttribute("onclick");
-        children = [];
-
-        contents.classList.add("panel-contents");
-        body.classList.add("panel-body");
-        close.classList.add("panel-close");
-
-        close.textContent = "Close";
         onclick.value = "togglePanel('" + panel.id + "')";
 
+        contents = document.createElement("div");
+        contents.classList.add("panel-contents");
+
+        body = document.createElement("div");
+        body.classList.add("panel-body");
+
+        close = panel.getElementsByClassName("panel-close")[0];
+        if (!close) {
+            close = document.createElement("div");
+            close.classList.add("panel-close");
+            close.textContent = "Close";
+        }
+        close.setAttributeNode(onclick);
+
+        children = [];
         panel.childNodes.forEach(child => {
             if (child instanceof Node) {
                 children.push(child);
             }
         });
 
-        close.setAttributeNode(onclick);
         panel.hidden = true;
         panel.textContent = "";
 
