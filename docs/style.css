@@ -42,6 +42,8 @@ html, body {
     max-width: 800px;
     aspect-ratio: 1 / 1;
     z-index: 0;
+    border: thin solid var(--foreground-color);
+    border-radius: 10px;
 }
 
 #control-bar {
