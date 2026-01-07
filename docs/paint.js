@@ -253,10 +253,6 @@ class Paint {
     #bindingIndex;
     #bindingObject;
 
-    #background;
-    #layers;
-    #grid;
-
     #backgroundBuffer;
     #layersBuffer;
     #gridBuffer;
@@ -282,15 +278,15 @@ class Paint {
 
         // Background renderer
         this.#loadBackground(0, 0, 0, 0);
-        this.#background = this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#backgroundBuffer, 0, 0));
+        this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#backgroundBuffer, 0, 0));
 
         // layer renderer
         this.#loadLayers();
-        this.#layers = this.set(10, 0, 0, 1, 0, this.#createImageRenderer(this.#layersBuffer));
+        this.set(10, 0, 0, 1, 0, this.#createImageRenderer(this.#layersBuffer));
 
         //Grid renderer
         this.#loadGrid(255, 255, 255, 64);
-        this.#grid = this.set(20, 0, 0, 1, 0, this.#createImageRenderer(this.#gridBuffer));
+        this.set(20, 0, 0, 1, 0, this.#createImageRenderer(this.#gridBuffer));
     }
 
     resize(width = 0, height = 0) {
@@ -306,7 +302,7 @@ class Paint {
     #bind(index = 0) {
         if (index !== this.#bindingIndex) {
             this.#bindingIndex = index;
-            this.#bindingObject = this.#objectList[index];
+            this.#bindingObject = this.#get(index);
         }
     }
 
@@ -448,8 +444,10 @@ class Paint {
         if (this.#gridBuffer)
             this.#gridBuffer.close();
 
-        const width = 64 / this.#layers.scale;
-        const height = 64 / this.#layers.scale;
+        this.#bind(10);
+
+        const width = 64 / this.#bindingObject.scale;
+        const height = 64 / this.#bindingObject.scale;
         const columns = (this.#view.width - 1) / width;
         const rows = (this.#view.height - 1) / height;
 
@@ -473,7 +471,7 @@ class Paint {
 
         this.#buffer.context.stroke();
         this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
-        
+
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.repaint();
