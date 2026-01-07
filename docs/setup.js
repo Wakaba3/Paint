@@ -145,6 +145,9 @@ function setup() {
     const params = new Map();
     const messages = new Map();
 
+    const limitX = value => Math.min(window.innerWidth - 1, Math.max(value, 0));
+    const limitY = value => Math.min(window.innerHeight - 1, Math.max(value, 0));
+
     panels.forEach(panel => {
         params.set(panel, {
             dragging: false,
@@ -171,7 +174,7 @@ function setup() {
 
         message.classList.add("message");
         message.textContent = event.detail;
-        message.style.top = (10 + (messages.size % 11) * 10) + "px";
+        message.style.top = limitY(10 + (messages.size % 11) * 10) + "px";
 
         document.body.appendChild(message);
 
@@ -193,8 +196,8 @@ function setup() {
     addEventListener("pointermove", event => {
         params.forEach((params, panel) => {
             if (params.dragging) {
-                panel.style.left = (event.pageX + params.offsetX) + "px";
-                panel.style.top = (event.pageY + params.offsetY) + "px";
+                panel.style.left = limitX(event.pageX + params.offsetX) + "px";
+                panel.style.top = limitY(event.pageY + params.offsetY) + "px";
 
                 params.normalX = panel.offsetLeft / window.innerWidth;
                 params.normalY = panel.offsetTop / window.innerHeight;
@@ -208,8 +211,8 @@ function setup() {
 
     window.addEventListener("resize", event => {
         params.forEach((params, panel) => {
-            panel.style.left = (params.normalX * window.innerWidth) + "px";
-            panel.style.top = (params.normalY * window.innerHeight) + "px";
+            panel.style.left = limitX(params.normalX * window.innerWidth) + "px";
+            panel.style.top = limitY(params.normalY * window.innerHeight) + "px";
         });
     });
 }
