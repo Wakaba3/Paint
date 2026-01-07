@@ -420,9 +420,9 @@ class Paint {
             }
         }
 
-        this.#buffer.context.moveTo(0, height - 1);
-        this.#buffer.context.lineTo(width - 1, height - 1);
-        this.#buffer.context.lineTo(width - 1, 0);
+        this.#buffer.context.moveTo(0, this.#view.height - 1);
+        this.#buffer.context.lineTo(this.#view.width - 1, this.#view.height - 1);
+        this.#buffer.context.lineTo(this.#view.width - 1, 0);
 
         this.#buffer.context.stroke();
         this.#grid = this.#buffer.canvas.transferToImageBitmap();
