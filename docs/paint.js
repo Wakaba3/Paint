@@ -257,12 +257,17 @@ class Paint {
     #layers;
     #grid;
 
+    #backgroundBuffer;
+    #layersBuffer;
+    #gridBuffer;
+
     #renderer;
     #repaint;
 
     constructor(view, width, height) {
         this.#view = view;
         this.#context = view.getContext("2d");
+        this.#context.imageSmoothingEnabled = false;
         this.#canvas = new Canvas(width, height);
         this.#buffer = new Frame(view.width, view.height);
 
@@ -275,22 +280,28 @@ class Paint {
 
         this.#repaint = true;
 
-        this.setBackground(0, 0, 0, 0);
-        this.setLayers();
-        this.setGrid(64, 64, 255, 255, 255, 64);
+        this.loadBackground(0, 0, 0, 0);
+        this.loadLayers();
+        this.loadGrid(255, 255, 255, 64);
 
         // Background renderer
-        this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
+        this.#background = this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#backgroundBuffer, 0, 0));
 
-        // Canvas renderer
-        this.set(10, 0, 0, 1, 0, this.#layers);
+        // layer renderer
+        this.#layers = this.set(10, 0, 0, 1, 0, this.#layersBuffer);
 
         //Grid renderer
-        this.set(20, 0, 0, 1, 0, this.#grid);
+        this.#grid = this.set(20, 0, 0, 1, 0, this.#gridBuffer);
     }
 
     resize(width = 0, height = 0) {
-        return this.#canvas.resize(width, height);
+        if (this.#canvas.resize(width, height)) {
+            this.loadGrid(255, 255, 255, 64);
+
+            return true;
+        }
+
+        return false;
     }
 
     #bind(index = 0) {
@@ -313,6 +324,7 @@ class Paint {
         this.#bind(index);
 
         this.#bindingObject.scale *= 2 ** power;
+        this.#bindingObject.scale = Math.max(2 ** -8, this.#bindingObject.scale);
 
         this.repaint();
     }
@@ -324,6 +336,18 @@ class Paint {
         this.#bindingObject.angle %= 360;
 
         this.repaint();
+    }
+
+    #get(index = 0) {
+        let object = this.#objectList[index];
+
+        return object ? object : {
+            x: 0,
+            y: 0,
+            scale: 0,
+            angle: 0,
+            renderer: () => {}
+        };
     }
 
     set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = null) {
@@ -365,6 +389,8 @@ class Paint {
         }
 
         this.repaint();
+
+        return object;
     }
 
     remove(index = 0) {
@@ -373,47 +399,49 @@ class Paint {
         this.repaint();
     }
 
-    setBackground(red = 0, green = 0, blue = 0, alpha = 0) {
-        if (this.#background)
-            this.#background.close();
+    loadBackground(red = 0, green = 0, blue = 0, alpha = 0) {
+        if (this.#backgroundBuffer)
+            this.#backgroundBuffer.close();
 
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.#buffer.context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
         this.#buffer.context.fillRect(0, 0, this.#buffer.width, this.#buffer.height);
-        this.#background = this.#buffer.canvas.transferToImageBitmap();
+        this.#backgroundBuffer = this.#buffer.canvas.transferToImageBitmap();
 
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.repaint();
     }
 
-    setLayers() {
-        if (this.#layers)
-            this.#layers.close();
+    loadLayers() {
+        if (this.#layersBuffer)
+            this.#layersBuffer.close();
 
-        this.#layers = this.#canvas.composite();
+        this.#layersBuffer = this.#canvas.composite();
 
         this.repaint();
     }
 
-    setGrid(width = 0, height = 0, red = 0, green = 0, blue = 0, alpha = 0) {
+    loadGrid(red = 0, green = 0, blue = 0, alpha = 0) {
         if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0)
             return;
 
-        if (this.#grid)
-            this.#grid.close();
+        if (this.#gridBuffer)
+            this.#gridBuffer.close();
 
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
         this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
         this.#buffer.context.lineWidth = 1;
         this.#buffer.context.beginPath();
 
-        const vns = (this.#view.width - 1) / width;
-        const hns = (this.#view.height - 1) / height;
+        const width = 64 / this.#layers.scale;
+        const height = 64 / this.#layers.scale;
+        const columns = (this.#view.width - 1) / width;
+        const rows = (this.#view.height - 1) / height;
 
-        for (let j = 0; j <= hns; ++j) {
-            for (let i = 0; i <= vns; ++i) {
+        for (let j = 0; j <= columns; ++j) {
+            for (let i = 0; i <= rows; ++i) {
                 this.#buffer.context.moveTo((i + 1) * width - 1, j * height);
                 this.#buffer.context.lineTo(i * width, j * height);
                 this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
@@ -425,7 +453,7 @@ class Paint {
         this.#buffer.context.lineTo(this.#view.width - 1, 0);
 
         this.#buffer.context.stroke();
-        this.#grid = this.#buffer.canvas.transferToImageBitmap();
+        this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
         this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         this.repaint();
