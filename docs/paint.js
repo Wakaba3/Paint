@@ -280,7 +280,7 @@ class Paint {
         this.set(1, 0, 0, 1, 0, this.#layers);
 
         //Grid renderer
-        this.set(2, 0, 0, 1, 0, this.#grid);
+        this.set(2, 0, 0, 1, 30, this.#grid);
     }
 
     #bind(index = 0) {
@@ -321,10 +321,10 @@ class Paint {
             const image = renderer;
 
             renderer = (x, y, scale, angle) => {
-                this.#context.translate(-this.#view.width / 2, -this.#view.height / 2);
+                this.#context.translate(this.#view.width / 2, this.#view.height / 2);
                 this.#context.rotate(angle * Paint.#RADIAN);
                 this.#context.scale(scale, scale);
-                this.#context.translate(this.#view.width / 2, this.#view.height / 2);
+                this.#context.translate(x, y);
                 this.#context.drawImage(image, 0, 0);
                 this.#context.resetTransform();
             };
