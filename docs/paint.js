@@ -241,8 +241,7 @@ class Paint {
     #bindingIndex;
     #bindingObject;
 
-    #rendering;
-    #frames;
+    #renderer;
 
     constructor(view, width, height) {
         this.#view = view;
@@ -252,8 +251,6 @@ class Paint {
         this.#objectList = new Array();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
-
-        this.#frames = 0;
     }
 
     #bind(index = 0) {
@@ -326,17 +323,19 @@ class Paint {
     run() {
         this.stop();
 
-        this.#rendering = setInterval(() => {
-            this.#render(this.#frames / 20);
+        let frames = 0;
 
-            ++this.#frames;
-            if (this.#frames >= 20) {
+        this.#renderer = setInterval(() => {
+            this.#render(frames / 20);
+
+            ++frames;
+            if (frames >= 20) {
                 postMessage({
                     type: "message",
                     message: "1sec"
                 });
 
-                this.#frames = 0;
+                frames = 0;
 
                 this.#objectList.forEach(object => {
                     object.x0 = object.x1;
@@ -349,8 +348,8 @@ class Paint {
     }
 
     stop() {
-        if (Number.isFinite(this.#rendering)) {
-            clearInterval(this.#rendering);
+        if (Number.isFinite(this.#renderer)) {
+            clearInterval(this.#renderer);
         }
     }
 
