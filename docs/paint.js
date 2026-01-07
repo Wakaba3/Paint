@@ -246,6 +246,9 @@ class Paint {
     #canvas;
     #buffer;
 
+    #offsetX;
+    #offsetY;
+
     #objectList;
     #bindingIndex;
     #bindingObject;
@@ -262,6 +265,9 @@ class Paint {
         this.#context = view.getContext("2d");
         this.#canvas = new Canvas(width, height);
         this.#buffer = new Frame(view.width, view.height);
+
+        this.#offsetX = view.width / 2;
+        this.#offsetY = view.height / 2;
 
         this.#objectList = new Array();
         this.#bindingIndex = -1;
@@ -321,10 +327,10 @@ class Paint {
             const image = renderer;
 
             renderer = (x, y, scale, angle) => {
-                this.#context.translate(this.#view.width / 2, this.#view.height / 2);
+                this.#context.translate(this.#offsetX, this.#offsetY);
                 this.#context.rotate(angle * Paint.#RADIAN);
                 this.#context.scale(scale, scale);
-                this.#context.translate(x - this.#view.width / 2, y - this.#view.height / 2);
+                this.#context.translate(x - this.#offsetX, y - this.#offsetY);
                 this.#context.drawImage(image, 0, 0);
                 this.#context.resetTransform();
             };
