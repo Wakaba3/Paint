@@ -397,7 +397,10 @@ class Paint {
         this.repaint();
     }
 
-    setGrid(width = 64, height = 64, red = 64, green = 64, blue = 64, alpha = 255) {
+    setGrid(width = 0, height = 0, red = 0, green = 0, blue = 0, alpha = 0) {
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0)
+            return;
+
         if (this.#grid)
             this.#grid.close();
 
@@ -416,6 +419,10 @@ class Paint {
                 this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
             }
         }
+
+        this.#buffer.context.moveTo(0, height - 1);
+        this.#buffer.context.lineTo(width - 1, height - 1);
+        this.#buffer.context.lineTo(width - 1, 0);
 
         this.#buffer.context.stroke();
         this.#grid = this.#buffer.canvas.transferToImageBitmap();
