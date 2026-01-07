@@ -13,7 +13,7 @@ paint.postMessage({
     view: view,
     canvasWidth: 768,
     canvasHeight: 1024
-});
+}, [view]);
 
 paint.onmessage = event => {
     switch (event.data.type) {
