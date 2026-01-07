@@ -269,9 +269,9 @@ class Paint {
 
         this.#repaint = true;
 
-        this.setBackground(64, 0, 0, 255);
+        this.setBackground();
         this.setLayers();
-        this.setGrid(64, 64, 128, 128, 128, 255);
+        this.setGrid();
 
         // Background renderer
         this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
@@ -280,7 +280,7 @@ class Paint {
         this.set(1, 0, 0, 1, 0, this.#layers);
 
         //Grid renderer
-        this.set(2, 0, 0, 1, 0, this.#grid);
+        this.set(2, 0, 0, 1, 30, this.#grid);
     }
 
     #bind(index = 0) {
@@ -317,7 +317,7 @@ class Paint {
     }
 
     set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = null) {
-        if (!(renderer instanceof Function)) {
+        if (renderer && !(renderer instanceof Function)) {
             const image = renderer;
 
             renderer = (x, y, scale, angle) => {
