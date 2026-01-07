@@ -72,7 +72,7 @@ addEventListener("panelclose", event => {
 addEventListener("keydown", event => {
     keys.add(event.key);
 
-    let dx = 0, dy = 0, coef;
+    let dx = 0, dy = 0, dScl = 0;
 
     if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
         dx -= 1;
@@ -82,11 +82,21 @@ addEventListener("keydown", event => {
         dx += 1;
     if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
         dy -= 1;
+    if (keys.has("+"))
+        dScl += 1;
+    if (keys.has("-"))
+        dScl -= 1;
 
-    coef = Math.sqrt(dx * dx + dy * dy);
+    if (dx !== 0 || dy !== 0) {
+        const length = Math.sqrt(dx * dx + dy * dy);
 
-    if (length > 0) {
-        translateCanvas(dx / length, dy / length);
+        if (length > 0) {
+            translateCanvas(dx / length, dy / length);
+        }
+    }
+
+    if (dScl !== 0) {
+        scaleCanvas(dScl);
     }
 });
 
