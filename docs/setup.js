@@ -161,11 +161,11 @@ function setup() {
 
     setInterval(() => {
         messages.forEach((age, message) => {
-            ++age;
-
             if (age >= 3) {
                 message.remove();
                 messages.delete(message);
+            } else {
+                messages.set(message, ++age);
             }
         });
     }, 1000);
