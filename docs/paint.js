@@ -395,7 +395,7 @@ class Paint {
         this.repaint();
     }
 
-    setGrid(width = 64, height = 64, red = 64, green = 64, blue = 64, alpha = 64) {
+    setGrid(width = 64, height = 64, red = 64, green = 64, blue = 64, alpha = 255) {
         if (this.#grid)
             this.#grid.close();
 
