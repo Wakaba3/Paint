@@ -11,8 +11,8 @@ const sizeHeight = document.getElementById("size-height");
 paint.postMessage({
     type: "init",
     view: view,
-    canvasWidth: 768,
-    canvasHeight: 1024
+    width: 768,
+    height: 1024
 }, [view]);
 
 paint.onmessage = event => {
