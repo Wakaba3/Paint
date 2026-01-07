@@ -60,7 +60,7 @@ addEventListener("panelclose", event => {
             importImages(Array.from(importChooser.files));
 
             break;
-        case "preference-panel":
+        case "size-panel":
             resizeCanvas(Number(sizeWidth.value), Number(sizeHeight.value));
 
             break;
