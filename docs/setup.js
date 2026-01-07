@@ -147,6 +147,7 @@ function setup() {
 
     //Element handling
     const params = new Map();
+    const messages = new Map();
 
     panels.forEach(panel => {
         params.set(panel, {
@@ -158,6 +159,17 @@ function setup() {
         });
     });
 
+    setInterval(() => {
+        messages.forEach((age, message) => {
+            ++age;
+
+            if (age >= 3) {
+                message.remove();
+                messages.delete(message);
+            }
+        });
+    }, 1000);
+
     addEventListener("showmessage", event => {
         const message = document.createElement("div");
 
@@ -166,7 +178,7 @@ function setup() {
 
         document.body.appendChild(message);
 
-        setTimeout(() => message.remove(), 3000);
+        messages.set(message, 0);
     });
 
     addEventListener("pointerdown", event => {
