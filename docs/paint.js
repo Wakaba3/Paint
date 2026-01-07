@@ -442,14 +442,17 @@ class Paint {
         let frames = 0;
 
         this.#renderer = setInterval(() => {
-            if (this.#repaint)
-                this.#render(frames / 20);
+            if (this.#repaint) {
+                if (frames >= 20) {
+                    this.#repaint = false;
+                    frames = 0;
 
-            ++frames;
-            if (frames >= 20) {
-                frames = 0;
+                    this.#render(1);
+                } else {
+                    this.#render(frames / 20);
+                }
 
-                this.#repaint = false;
+                ++frames;
             }
         }, 1000 / 30);
     }
