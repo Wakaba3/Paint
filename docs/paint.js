@@ -462,10 +462,10 @@ class Paint {
 
         this.#objectList.forEach(object => {
             object.renderer(
-                View.#lerp(step, object.x0, object.x1),
-                View.#lerp(step, object.y0, object.y1),
-                View.#lerp(step, object.scale0, object.scale1),
-                View.#lerp(step, object.angle0, object.angle1)
+                Paint.#lerp(step, object.x0, object.x1),
+                Paint.#lerp(step, object.y0, object.y1),
+                Paint.#lerp(step, object.scale0, object.scale1),
+                Paint.#lerp(step, object.angle0, object.angle1)
             );
         });
     }
