@@ -275,9 +275,9 @@ class Paint {
 
         this.#repaint = true;
 
-        this.setBackground();
+        this.setBackground(240, 240, 240, 255);
         this.setLayers();
-        this.setGrid();
+        this.setGrid(64, 64, 64, 64, 64, 64);
 
         // Background renderer
         this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#background, 0, 0));
