@@ -451,30 +451,32 @@ class Paint {
         const columns = (this.#view.width - 1) / width;
         const rows = (this.#view.height - 1) / height;
 
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+        const context = this.#buffer.context;
 
-        this.#buffer.context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-        this.#buffer.context.lineWidth = 1;
-        this.#buffer.context.beginPath();
-        this.#buffer.context.translate(0.5, 0.5);
+        context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+
+        context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.translate(0.5, 0.5);
 
         for (let j = 0; j <= columns; ++j) {
             for (let i = 0; i <= rows; ++i) {
-                this.#buffer.context.moveTo((i + 1) * width - 1, j * height);
-                this.#buffer.context.lineTo(i * width, j * height);
-                this.#buffer.context.lineTo(i * width, (j + 1) * height - 1);
+                context.moveTo((i + 1) * width - 1, j * height);
+                context.lineTo(i * width, j * height);
+                context.lineTo(i * width, (j + 1) * height - 1);
             }
         }
 
-        this.#buffer.context.moveTo(0, this.#view.height - 1);
-        this.#buffer.context.lineTo(this.#view.width - 1, this.#view.height - 1);
-        this.#buffer.context.lineTo(this.#view.width - 1, 0);
-        this.#buffer.context.stroke();
-        this.#buffer.context.resetTransform();
+        context.moveTo(0, this.#view.height - 1);
+        context.lineTo(this.#view.width - 1, this.#view.height - 1);
+        context.lineTo(this.#view.width - 1, 0);
+        context.stroke();
+        context.resetTransform();
 
         this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
 
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+        context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
 
         postMessage({
             type: "message",
