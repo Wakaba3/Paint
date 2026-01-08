@@ -274,33 +274,29 @@ class Paint {
         this.#repaint = true;
 
         // Background renderer
-        this.setObject(0, 0, 0, 1, 0, () => (context, x, y, scale, angle) => {
+        this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle) => {
             context.fillStyle = "rgba(0, 0, 0, 0)";
-            context.fillRect(0, 0, this.#view.width, this.#view.height);
+            context.fillRect(0, 0, width, height);
         });
 
         // layer renderer
-        this.setObject(10, 0, 0, 1, 0, (context, x, y, scale, angle) => {
-            context.translate(this.vcx, this.vcy);
+        this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
+            context.translate(x + (width * scale) / 2, y + (height * scale) / 2);
             context.scale(scale, scale);
             context.rotate(angle * Paint.#RADIAN);
-            context.translate(x - this.vcx, y - this.vcy);
+            context.translate(width * scale / -2, height * scale / -2);
             context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
             context.resetTransform();
         });
 
         //Grid renderer
-        this.setObject(20, 0, 0, 1, 0, (context, x, y, scale, angle) => {
-            context.translate(this.vcx, this.vcy);
+        this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
+            context.translate(x + (width * scale) / 2, y + (height * scale) / 2);
             context.rotate(angle * Paint.#RADIAN);
-            context.translate(x - this.vcx, y - this.vcy);
+            context.translate(width * scale / -2, height * scale / -2);
 
-            this.#bindObject(10);
-
-            const width = this.width * this.#bindingObject.scale - 1;
-            const height = this.height * this.#bindingObject.scale - 1;
-            const columns = width / Paint.#MAX_SCALE;
-            const rows = height / Paint.#MAX_SCALE;
+            const columns = (width - 1) / Paint.#MAX_SCALE;
+            const rows = (height - 1) / Paint.#MAX_SCALE;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
@@ -308,12 +304,12 @@ class Paint {
             
             for (let i = 1; i < columns; ++i) {
                 context.moveTo(i * Paint.#MAX_SCALE, 0);
-                context.lineTo(i * Paint.#MAX_SCALE, height);
+                context.lineTo(i * Paint.#MAX_SCALE, height - 1);
             }
 
             for (let i = 1; i < rows; ++i) {
                 context.moveTo(0, i * Paint.#MAX_SCALE);
-                context.lineTo(width, i * Paint.#MAX_SCALE);
+                context.lineTo(width - 1, i * Paint.#MAX_SCALE);
             }
 
             context.stroke();
@@ -321,16 +317,17 @@ class Paint {
             context.strokeStyle = "rgba(128, 128, 128, 255)";
             context.beginPath();
             context.moveTo(0, 0);
-            context.lineTo(0, height);
-            context.lineTo(width, height);
-            context.lineTo(width, 0);
+            context.lineTo(0, height - 1);
+            context.lineTo(width - 1, height - 1);
+            context.lineTo(width - 1, 0);
             context.lineTo(0, 0);
             context.stroke();
 
             context.resetTransform();
         });
 
-        this.addFunction("grid", () => {
+        this.addFunction("grid-setup", () => {
+            this.resizeObject(10, this.width, this.height);
             this.imitateObject(10, 20);
         });
     }
@@ -366,7 +363,7 @@ class Paint {
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
         this.#functions.forEach(execution => execution());
-        this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.scale, object.angle));
+        this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.width, object.height, object.scale, object.angle));
     }
 
     repaint() {
@@ -383,8 +380,17 @@ class Paint {
     translateObject(index = 0, dx = 0, dy = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.x += dx * Math.max(1, this.#bindingObject.scale);
-        this.#bindingObject.y += dy * Math.max(1, this.#bindingObject.scale);
+        this.#bindingObject.x += Number.isFinite(dx) ? dx * Math.max(1, this.#bindingObject.scale) : 0;
+        this.#bindingObject.y += Number.isFinite(dy) ? dy * Math.max(1, this.#bindingObject.scale) : 0;
+
+        this.repaint();
+    }
+
+    resizeObject(index = 0, width = 0, height = 0) {
+        this.#bindObject(index);
+
+        this.#bindingObject.width = Number.isFinite(width) ? width : 0;
+        this.#bindingObject.height = Number.isFinite(height) ? height : 0;
 
         this.repaint();
     }
@@ -392,7 +398,7 @@ class Paint {
     scaleObject(index = 0, dScale = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.scale *= dScale;
+        this.#bindingObject.scale *= Number.isFinite(dScale) ? dScale : 1;
         this.#bindingObject.scale = Math.min(Paint.#MAX_SCALE, Math.max(this.#bindingObject.scale, Paint.#MIN_SCALE));
 
         this.repaint();
@@ -401,7 +407,7 @@ class Paint {
     rotateObject(index = 0, dAngle = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.angle -= dAngle;
+        this.#bindingObject.angle -= Number.isFinite(dAngle) ? dAngle : 0;
         this.#bindingObject.angle %= 360;
 
         this.repaint();
@@ -414,6 +420,8 @@ class Paint {
 
         targetObject.x = this.#bindingObject.x;
         targetObject.y = this.#bindingObject.y;
+        targetObject.width = this.#bindingObject.width;
+        targetObject.height = this.#bindingObject.height;
         targetObject.scale = this.#bindingObject.scale;
         targetObject.angle = this.#bindingObject.angle;
 
@@ -426,27 +434,31 @@ class Paint {
         return object ? object : this.createObject();
     }
 
-    createObject(x = 0, y = 0, scale = 0, angle = 0, renderer = () => {}) {
+    createObject(x = 0, y = 0, width = 0, height = 0, scale = 0, angle = 0, renderer = () => {}) {
         return {
             x: x,
             y: y,
+            width: width,
+            height: height,
             scale: scale,
             angle: angle,
             renderer: renderer
         };
     }
 
-    setObject(index = 0, x, y, scale, angle, renderer) {
+    setObject(index = 0, x, y, width, height, scale, angle, renderer) {
         let object = this.#objects[index];
 
         if (object) {
             object.x = Number.isFinite(x) ? x : object.x;
             object.y = Number.isFinite(y) ? y : object.y;
+            object.width = Number.isFinite(width) ? width : object.width;
+            object.height = Number.isFinite(height) ? height : object.height;
             object.scale = Number.isFinite(scale) ? scale : object.scale;
             object.angle = Number.isFinite(angle) ? angle : object.angle;
             object.renderer = renderer instanceof Function ? renderer : object.renderer;
         } else {
-            object = this.createObject(x, y, scale, angle, renderer);
+            object = this.createObject(x, y, width, height, scale, angle, renderer);
         }
 
         if (index >= this.#objects.length) {
@@ -495,14 +507,6 @@ class Paint {
 
             this.#buffers.delete(name);
         }
-    }
-
-    get vcx() {
-        return this.#view.width / 2;
-    }
-
-    get vcy() {
-        return this.#view.height / 2;
     }
 
     get width() {
