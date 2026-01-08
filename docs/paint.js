@@ -248,12 +248,8 @@ class Paint {
     #buffer;
     #canvas;
 
-    #offsetX;
-    #offsetY;
-    #backgroundColor;
-
     #objects;
-    #modifiers;
+    #functions;
     #bindingIndex;
     #bindingObject;
 
@@ -269,11 +265,8 @@ class Paint {
         this.#buffer = new Frame(view.width, view.height);
         this.#canvas = new Canvas(width, height);
 
-        this.#offsetX = view.width / 2;
-        this.#offsetY = view.height / 2;
-
         this.#objects = new Array();
-        this.#modifiers = new Map();
+        this.#functions = new Map();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
 
@@ -288,20 +281,20 @@ class Paint {
 
         // layer renderer
         this.setObject(10, 0, 0, 1, 0, (context, x, y, scale, angle) => {
-            context.translate(this.#offsetX, this.#offsetY);
+            context.translate(this.vcx, this.vcy);
             context.rotate(angle * Paint.#RADIAN);
             context.scale(scale, scale);
-            context.translate(x - this.#offsetX, y - this.#offsetY);
+            context.translate(x - this.vcx, y - this.vcy);
             context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
             context.resetTransform();
         });
 
         //Grid renderer
         this.setObject(20, 0, 0, 1, 0, (context, x, y, scale, angle) => {
-            context.translate(this.#offsetX, this.#offsetY);
+            context.translate(this.vcx, this.vcy);
             context.rotate(angle * Paint.#RADIAN);
             context.scale(scale, scale);
-            context.translate(x - this.#offsetX + 0.5, y - this.#offsetY + 0.5);
+            context.translate(x - this.vcx + 0.5, y - this.vcy + 0.5);
 
             this.#bindObject(10);
 
@@ -333,7 +326,7 @@ class Paint {
             });
         });
 
-        this.addModifier(() => {
+        this.addFunction("grid", () => {
             this.imitateObject(10, 20);
         });
     }
@@ -362,7 +355,7 @@ class Paint {
 
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
-        this.#modifiers.forEach(modifier => modifier());
+        this.#functions.forEach(modifier => modifier());
         this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.scale, object.angle));
     }
 
@@ -463,12 +456,12 @@ class Paint {
         this.repaint();
     }
 
-    addModifier(name = "", modifier = () => {}) {
-        this.#modifiers.set(name, modifier);
+    addFunction(name = "", execution = () => {}) {
+        this.#functions.set(name, execution);
     }
 
-    removeModifier(name = "") {
-        this.#modifiers.delete(name);
+    removeFunction(name = "") {
+        this.#functions.delete(name);
     }
 
     #registerBuffer(name = "", image = null) {
@@ -492,6 +485,14 @@ class Paint {
 
             this.#buffers.delete(name);
         }
+    }
+
+    get vcx() {
+        return this.#view.width / 2;
+    }
+
+    get vcy() {
+        return this.#view.height / 2;
     }
 
     get width() {
