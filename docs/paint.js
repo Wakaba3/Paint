@@ -284,8 +284,8 @@ class Paint {
             context.translate(this.vcx, this.vcy);
             context.scale(scale, scale);
             context.rotate(angle * Paint.#RADIAN);
-            context.translate(-this.vcx, -this.vcy);
-            context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), x, y);
+            context.translate(x - this.vcx, y - this.vcy);
+            context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
             context.resetTransform();
         });
 
@@ -293,7 +293,7 @@ class Paint {
         this.setObject(20, 0, 0, 1, 0, (context, x, y, scale, angle) => {
             context.translate(this.vcx, this.vcy);
             context.rotate(angle * Paint.#RADIAN);
-            context.translate(-this.vcx, -this.vcy);
+            context.translate(x - this.vcx, y - this.vcy);
 
             this.#bindObject(10);
 
@@ -307,24 +307,24 @@ class Paint {
             context.beginPath();
             
             for (let i = 1; i < columns; ++i) {
-                context.moveTo(x + i * Paint.#MAX_SCALE, y);
-                context.lineTo(x + i * Paint.#MAX_SCALE, y + height);
+                context.moveTo(i * Paint.#MAX_SCALE, 0);
+                context.lineTo(i * Paint.#MAX_SCALE, height);
             }
 
             for (let i = 1; i < rows; ++i) {
-                context.moveTo(x, y + i * Paint.#MAX_SCALE);
-                context.lineTo(x + width, y + i * Paint.#MAX_SCALE);
+                context.moveTo(0, i * Paint.#MAX_SCALE);
+                context.lineTo(width, i * Paint.#MAX_SCALE);
             }
 
             context.stroke();
 
             context.strokeStyle = "rgba(128, 128, 128, 255)";
             context.beginPath();
-            context.moveTo(x, y);
-            context.lineTo(x, y + height);
-            context.lineTo(x + width, y + height);
-            context.lineTo(x + width, y);
-            context.lineTo(x, y);
+            context.moveTo(0, );
+            context.lineTo(0, height);
+            context.lineTo(width, height);
+            context.lineTo(width, 0);
+            context.lineTo(0, 0);
             context.stroke();
 
             context.resetTransform();
