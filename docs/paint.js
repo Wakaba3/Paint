@@ -336,7 +336,13 @@ class Paint {
     }
 
     resize(width = 0, height = 0) {
-        return this.#canvas.resize(width, height);
+        if (this.#canvas.resize(width, height)) {
+            this.#repaint();
+
+            return true;
+        }
+
+        return false;
     }
 
     run() {
@@ -377,8 +383,8 @@ class Paint {
     translateObject(index = 0, dx = 0, dy = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.x += dx * this.#bindingObject.scale;
-        this.#bindingObject.y += dy * this.#bindingObject.scale;
+        this.#bindingObject.x += dx * Math.max(1, this.#bindingObject.scale);
+        this.#bindingObject.y += dy * Math.max(1, this.#bindingObject.scale);
 
         this.repaint();
     }
