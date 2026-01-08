@@ -324,6 +324,7 @@ class Paint {
             context.lineTo(x, y + height);
             context.lineTo(x + width, y + height);
             context.lineTo(x + width, y);
+            context.lineTo(x, y);
             context.stroke();
 
             context.resetTransform();
