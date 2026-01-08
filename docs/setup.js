@@ -171,7 +171,7 @@ function setup() {
 
         message.classList.add("message");
         message.textContent = event.detail;
-        message.style.top = Math.min(window.innerHeight - 1, Math.max(10 + (messages.size % 11) * 10, 0)) + "px";
+        message.style.top = (10 + 25 * (messages.size % 5)) + "px";
 
         document.body.appendChild(message);
 
