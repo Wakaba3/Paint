@@ -72,7 +72,7 @@ addEventListener("panelclose", event => {
 addEventListener("keydown", event => {
     keys.add(event.key);
 
-    let dx = 0, dy = 0, dScl = 0;
+    let dx = 0, dy = 0, mScale = 1;
 
     if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
         dx -= 1;
@@ -83,9 +83,9 @@ addEventListener("keydown", event => {
     if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
         dy -= 1;
     if (keys.has("+"))
-        dScl += 0.5;
+        mScale *= Math.SQRT2;
     if (keys.has("-"))
-        dScl -= 0.5;
+        mScale /= Math.SQRT2;
 
     if (dx !== 0 || dy !== 0) {
         const length = Math.sqrt(dx * dx + dy * dy);
@@ -95,8 +95,8 @@ addEventListener("keydown", event => {
         }
     }
 
-    if (dScl !== 0) {
-        scaleCanvas(dScl);
+    if (mScale !== 0) {
+        scaleCanvas(mScale);
     }
 });
 
@@ -136,24 +136,24 @@ function resizeCanvas(width = 0, height = 0) {
 function translateCanvas(dx = 0, dy = 0) {
     paint.postMessage({
         type: "translate",
-        index: [10, 20],
+        index: 10,
         dx: dx,
         dy: dy
     });
 }
 
-function scaleCanvas(power = 0) {
+function scaleCanvas(dScale = 0) {
     paint.postMessage({
         type: "scale",
-        index: [10, 20],
-        power: power
+        index: 10,
+        dScale: dScale
     });
 }
 
-function rotateCanvas(angle = 0) {
+function rotateCanvas(dAngle = 0) {
     paint.postMessage({
         type: "rotate",
-        index: [10, 20],
-        angle: angle
+        index: 10,
+        dAngle: dAngle
     });
 }

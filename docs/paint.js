@@ -239,152 +239,103 @@ class Canvas {
 }
 
 class Paint {
+    static #MIN_SCALE = 2 ** -3;
+    static #MAX_SCALE = 2 ** 6;
     static #RADIAN = Math.PI / 180;
 
     #view;
     #context;
-    #canvas;
     #buffer;
+    #canvas;
 
     #offsetX;
     #offsetY;
+    #backgroundColor;
 
     #objectList;
+    #modifierList;
     #bindingIndex;
     #bindingObject;
 
-    #backgroundBuffer;
-    #layersBuffer;
-    #gridBuffer;
+    #imageBuffer;
 
     #renderer;
     #repaint;
 
-    constructor(view, width, height) {
+    constructor(view = null, width = 0, height = 0) {
         this.#view = view;
         this.#context = view.getContext("2d");
         this.#context.imageSmoothingEnabled = false;
-        this.#canvas = new Canvas(width, height);
         this.#buffer = new Frame(view.width, view.height);
+        this.#canvas = new Canvas(width, height);
 
         this.#offsetX = view.width / 2;
         this.#offsetY = view.height / 2;
 
         this.#objectList = new Array();
+        this.#modifierList = new Map();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
 
+        this.#imageBuffer = new Map();
         this.#repaint = true;
 
         // Background renderer
-        this.#loadBackground(0, 0, 0, 0);
-        this.set(0, 0, 0, 1, 0, () => this.#context.drawImage(this.#backgroundBuffer, 0, 0));
+        this.setObject(0, 0, 0, 1, 0, () => (x, y, scale, angle) => {
+            this.#context.fillStyle = "rgba(0, 0, 0, 0)";
+            this.#context.fillRect(0, 0, this.#view.width, this.#view.height);
+        });
 
         // layer renderer
-        this.#loadLayers();
-        this.set(10, 0, 0, 1, 0, this.#createImageRenderer(this.#layersBuffer));
-
-        //Grid renderer
-        this.#loadGrid(255, 255, 255, 64);
-        this.set(20, 0, 0, 1, 0, (x, y, scale, angle) => {
+        this.setObject(10, 0, 0, 1, 0, (x, y, scale, angle) => {
             this.#context.translate(this.#offsetX, this.#offsetY);
             this.#context.rotate(angle * Paint.#RADIAN);
+            this.#context.scale(scale, scale);
             this.#context.translate(x - this.#offsetX, y - this.#offsetY);
-            this.#context.drawImage(this.#gridBuffer, 0, 0);
+            this.#context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
             this.#context.resetTransform();
+        });
+
+        //Grid renderer
+        this.setObject(20, 0, 0, 1, 0, (x, y, scale, angle) => {
+            this.#context.translate(this.#offsetX, this.#offsetY);
+            this.#context.rotate(angle * Paint.#RADIAN);
+            this.#context.scale(scale, scale);
+            this.#context.translate(x - this.#offsetX + 0.5, y - this.#offsetY + 0.5);
+
+            this.#bindObject(10);
+
+            const width = this.width * this.#bindingObject.scale - 1;
+            const height = this.height * this.#bindingObject.scale - 1;
+            const columns = width / Paint.#MAX_SCALE;
+            const rows = height / Paint.#MAX_SCALE;
+
+            this.#context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
+            this.#context.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            this.#context.lineWidth = 1;
+            this.#context.beginPath();
+            
+            for (let i = 0; i < columns; ++i) {
+                this.#context.moveTo(i * Paint.#MAX_SCALE, 0);
+                this.#context.lineTo(i * Paint.#MAX_SCALE, height);
+            }
+
+            for (let i = 0; i < rows; ++i) {
+                this.#context.moveTo(0, i * Paint.#MAX_SCALE);
+                this.#context.lineTo(width, i * Paint.#MAX_SCALE);
+            }
+
+            this.#context.stroke();
+            this.#context.resetTransform();
+        });
+
+        this.addModifier(() => {
+            this.imitateObject(10, 20);
         });
     }
 
     resize(width = 0, height = 0) {
-        if (this.#canvas.resize(width, height)) {
-            this.#loadGrid(255, 255, 255, 64);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    #bind(index = 0) {
-        if (index !== this.#bindingIndex) {
-            this.#bindingIndex = index;
-            this.#bindingObject = this.#get(index);
-        }
-    }
-
-    translate(index = 0, dx = 0, dy = 0) {
-        this.#bind(index);
-
-        this.#bindingObject.x += dx * this.#bindingObject.scale;
-        this.#bindingObject.y += dy * this.#bindingObject.scale;
-
-        this.repaint();
-    }
-
-    scale(index = 0, power = 0) {
-        this.#bind(index);
-
-        this.#bindingObject.scale *= 2 ** power;
-        this.#bindingObject.scale = Math.max(2 ** -8, this.#bindingObject.scale);
-
-        this.repaint();
-    }
-
-    rotate(index = 0, angle = 0) {
-        this.#bind(index);
-
-        this.#bindingObject.angle += angle;
-        this.#bindingObject.angle %= 360;
-
-        this.repaint();
-    }
-
-    #get(index = 0) {
-        let object = this.#objectList[index];
-
-        return object ? object : {
-            x: 0,
-            y: 0,
-            scale: 0,
-            angle: 0,
-            renderer: () => {}
-        };
-    }
-
-    set(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = () => {}) {
-        let object = this.#objectList[index];
-
-        if (object) {
-            object.x = x;
-            object.y = y;
-            object.scale = scale;
-            object.angle = angle;
-            object.renderer = renderer ?? object.renderer;
-        } else {
-            object = {
-                x: x,
-                y: y,
-                scale: scale,
-                angle: angle,
-                renderer: renderer
-            };
-        }
-
-        if (index >= this.#objectList.length) {
-            this.#objectList[index] = object;
-        } else {
-            this.#objectList.splice(index, 1, object);
-        }
-
-        this.repaint();
-
-        return object;
-    }
-
-    remove(index = 0) {
-        this.#objectList.splice(index, 1);
-
-        this.repaint();
+        return this.#canvas.resize(width, height);
     }
 
     run() {
@@ -407,11 +358,136 @@ class Paint {
 
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
+        this.#modifierList.forEach(modifier => modifier.modify());
         this.#objectList.forEach(object => object.renderer(object.x, object.y, object.scale, object.angle));
     }
 
     repaint() {
         this.#repaint = true;
+    }
+
+    #bindObject(index = 0) {
+        if (index !== this.#bindingIndex) {
+            this.#bindingIndex = index;
+            this.#bindingObject = this.#getObject(index);
+        }
+    }
+
+    translateObject(index = 0, dx = 0, dy = 0) {
+        this.#bindObject(index);
+
+        this.#bindingObject.x += dx * this.#bindingObject.scale;
+        this.#bindingObject.y += dy * this.#bindingObject.scale;
+
+        this.repaint();
+    }
+
+    scaleObject(index = 0, scale = 0) {
+        this.#bindObject(index);
+
+        this.#bindingObject.scale *= scale;
+        this.#bindingObject.scale = Math.min(Paint.#MAX_SCALE, Math.max(this.#bindingObject.scale, Paint.#MIN_SCALE));
+
+        this.repaint();
+    }
+
+    rotateObject(index = 0, angle = 0) {
+        this.#bindObject(index);
+
+        this.#bindingObject.angle += angle;
+        this.#bindingObject.angle %= 360;
+
+        this.repaint();
+    }
+
+    imitateObject(sourceIndex = 0, targetIndex = 0) {
+        this.#bindObject(sourceIndex);
+
+        const targetObject = this.#getObject(targetIndex);
+
+        targetObject.x = this.#bindingObject.x;
+        targetObject.y = this.#bindingObject.y;
+        targetObject.scale = this.#bindingObject.scale;
+        targetObject.angle = this.#bindingObject.angle;
+
+        this.repaint();
+    }
+
+    #getObject(index = 0) {
+        let object = this.#objectList[index];
+
+        return object ? object : this.createObject();
+    }
+
+    createObject(x = 0, y = 0, scale = 0, angle = 0, renderer = () => {}) {
+        return {
+            x: x,
+            y: y,
+            scale: scale,
+            angle: angle,
+            renderer: renderer
+        };
+    }
+
+    setObject(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = () => {}) {
+        let object = this.#objectList[index];
+
+        if (object) {
+            object.x = x;
+            object.y = y;
+            object.scale = scale;
+            object.angle = angle;
+            object.renderer = renderer;
+        } else {
+            object = this.createObject(x, y, scale, angle);
+        }
+
+        if (index >= this.#objectList.length) {
+            this.#objectList[index] = object;
+        } else {
+            this.#objectList.splice(index, 1, object);
+        }
+
+        this.repaint();
+
+        return object;
+    }
+
+    removeObject(index = 0) {
+        this.#objectList.splice(index, 1);
+
+        this.repaint();
+    }
+
+    addModifier(name = "", modifier = () => {}) {
+        this.#modifierList.set(name, modifier);
+    }
+
+    removeModifier(name = "") {
+        this.#modifierList.delete(name);
+    }
+
+    #registerBuffer(name = "", image = null) {
+        if (image) {
+            this.#closeBuffer(name);
+
+            this.#imageBuffer.set(name, image);
+        }
+
+        return image;
+    }
+
+
+    #closeBuffer(name = "") {
+        const image = this.#imageBuffer.get(name);
+
+        if (image) {
+            if (image instanceof ImageBitmap) {
+                image.close();
+            }
+
+            this.#imageBuffer.delete(name);
+        }
     }
 
     get width() {
@@ -420,87 +496,6 @@ class Paint {
 
     get height() {
         return this.#canvas.height;
-    }
-
-    #loadBackground(red = 0, green = 0, blue = 0, alpha = 0) {
-        if (this.#backgroundBuffer)
-            this.#backgroundBuffer.close();
-
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-
-        this.#buffer.context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-        this.#buffer.context.fillRect(0, 0, this.#buffer.width, this.#buffer.height);
-        this.#backgroundBuffer = this.#buffer.canvas.transferToImageBitmap();
-
-        this.#buffer.context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-
-        this.repaint();
-    }
-
-    #loadLayers() {
-        if (this.#layersBuffer)
-            this.#layersBuffer.close();
-
-        this.#layersBuffer = this.#canvas.composite();
-
-        this.repaint();
-    }
-
-    #loadGrid(red = 0, green = 0, blue = 0, alpha = 0) {
-        if (this.#gridBuffer)
-            this.#gridBuffer.close();
-
-        this.#bind(10);
-
-        const width = 64 / this.#bindingObject.scale;
-        const height = 64 / this.#bindingObject.scale;
-        const columns = (this.#view.width - 1) / width;
-        const rows = (this.#view.height - 1) / height;
-
-        const context = this.#buffer.context;
-
-        context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-
-        context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-        context.lineWidth = 1;
-        context.beginPath();
-        context.translate(0.5, 0.5);
-
-        for (let j = 0; j <= columns; ++j) {
-            for (let i = 0; i <= rows; ++i) {
-                context.moveTo((i + 1) * width - 1, j * height);
-                context.lineTo(i * width, j * height);
-                context.lineTo(i * width, (j + 1) * height - 1);
-            }
-        }
-
-        context.moveTo(0, this.#view.height - 1);
-        context.lineTo(this.#view.width - 1, this.#view.height - 1);
-        context.lineTo(this.#view.width - 1, 0);
-        context.stroke();
-        context.resetTransform();
-
-        this.#gridBuffer = this.#buffer.canvas.transferToImageBitmap();
-
-        context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
-
-        postMessage({
-            type: "message",
-            message: `グリッド（幅、高さ）＝（${width}、${height}）をロードしました！`
-        });
-
-        this.repaint();
-    }
-
-    #createImageRenderer(image) {
-        return (x, y, scale, angle) => {
-            this.#context.translate(this.#offsetX, this.#offsetY);
-            this.#context.rotate(angle * Paint.#RADIAN);
-            this.#context.scale(scale, scale);
-            this.#context.translate(x - this.#offsetX, y - this.#offsetY);
-            this.#context.drawImage(image, 0, 0);
-            this.#context.resetTransform();
-        }
     }
 }
 
@@ -553,27 +548,15 @@ onmessage = event => {
 
             break;
         case "translate":
-            if (event.data.index instanceof Array) {
-                event.data.index.forEach(index => paint.translate(index, event.data.dx, event.data.dy));
-            } else {
-                paint.translate(event.data.index, event.data.dx, event.data.dy);
-            }
+            paint.translate(event.data.index, event.data.dx, event.data.dy);
 
             break;
         case "scale":
-            if (event.data.index instanceof Array) {
-                event.data.index.forEach(index => paint.scale(index, event.data.power));
-            } else {
-                paint.scale(event.data.index, event.data.power);
-            }
+            paint.scale(event.data.index, event.data.dScale);
 
             break;
         case "ratote":
-            if (event.data.index instanceof Array) {
-                event.data.index.forEach(index => paint.rotate(index, event.data.angle));
-            } else {
-                paint.rotate(event.data.index, event.data.angle);
-            }
+            paint.rotate(event.data.index, event.data.dAngle);
 
             break;
         default:
