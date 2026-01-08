@@ -252,7 +252,7 @@ class Paint {
     #offsetY;
     #backgroundColor;
 
-    #objectList;
+    #objects;
     #modifiers;
     #bindingIndex;
     #bindingObject;
@@ -272,7 +272,7 @@ class Paint {
         this.#offsetX = view.width / 2;
         this.#offsetY = view.height / 2;
 
-        this.#objectList = new Array();
+        this.#objects = new Array();
         this.#modifiers = new Map();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
@@ -310,7 +310,6 @@ class Paint {
             const columns = width / Paint.#MAX_SCALE;
             const rows = height / Paint.#MAX_SCALE;
 
-            this.#context.clearRect(0, 0, this.#buffer.width, this.#buffer.height);
             this.#context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             this.#context.lineWidth = 1;
             this.#context.beginPath();
@@ -359,7 +358,7 @@ class Paint {
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
         this.#modifiers.forEach(modifier => modifier());
-        this.#objectList.forEach(object => object.renderer(object.x, object.y, object.scale, object.angle));
+        this.#objects.forEach(object => object.renderer(object.x, object.y, object.scale, object.angle));
     }
 
     repaint() {
@@ -414,7 +413,7 @@ class Paint {
     }
 
     #getObject(index = 0) {
-        let object = this.#objectList[index];
+        let object = this.#objects[index];
 
         return object ? object : this.createObject();
     }
@@ -430,7 +429,7 @@ class Paint {
     }
 
     setObject(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = () => {}) {
-        let object = this.#objectList[index];
+        let object = this.#objects[index];
 
         if (object) {
             object.x = x;
@@ -442,10 +441,10 @@ class Paint {
             object = this.createObject(x, y, scale, angle);
         }
 
-        if (index >= this.#objectList.length) {
-            this.#objectList[index] = object;
+        if (index >= this.#objects.length) {
+            this.#objects[index] = object;
         } else {
-            this.#objectList.splice(index, 1, object);
+            this.#objects.splice(index, 1, object);
         }
 
         this.repaint();
@@ -454,7 +453,7 @@ class Paint {
     }
 
     removeObject(index = 0) {
-        this.#objectList.splice(index, 1);
+        this.#objects.splice(index, 1);
 
         this.repaint();
     }
