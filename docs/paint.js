@@ -281,22 +281,22 @@ class Paint {
 
         // layer renderer
         this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
-            context.translate(x + (width * scale) / 2, y + (height * scale) / 2);
+            context.translate(x + width / 2, y + height / 2);
             context.scale(scale, scale);
             context.rotate(angle * Paint.#RADIAN);
-            context.translate(width * scale / -2, height * scale / -2);
+            context.translate(width / -2, height / -2);
             context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
             context.resetTransform();
         });
 
         //Grid renderer
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
-            context.translate(x + (width * scale) / 2, y + (height * scale) / 2);
+            context.translate(x + width / 2, y + height / 2);
             context.rotate(angle * Paint.#RADIAN);
-            context.translate(width * scale / -2, height * scale / -2);
+            context.translate(width / -2, height / -2);
 
-            const columns = (width * scale - 1) / Paint.#MAX_SCALE;
-            const rows = (height * scale - 1) / Paint.#MAX_SCALE;
+            const columns = (width - 1) / Paint.#MAX_SCALE;
+            const rows = (height - 1) / Paint.#MAX_SCALE;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
@@ -363,7 +363,7 @@ class Paint {
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
         this.#functions.forEach(execution => execution());
-        this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.width, object.height, object.scale, object.angle));
+        this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.width * object.scale, object.height * object.scale, object.scale, object.angle));
     }
 
     repaint() {
