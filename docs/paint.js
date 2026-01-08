@@ -337,7 +337,7 @@ class Paint {
 
     resize(width = 0, height = 0) {
         if (this.#canvas.resize(width, height)) {
-            this.#repaint();
+            this.repaint();
 
             return true;
         }
