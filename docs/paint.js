@@ -295,8 +295,8 @@ class Paint {
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width * scale / -2, height * scale / -2);
 
-            const columns = (width - 1) / Paint.#MAX_SCALE;
-            const rows = (height - 1) / Paint.#MAX_SCALE;
+            const columns = (width * scale - 1) / Paint.#MAX_SCALE;
+            const rows = (height * scale - 1) / Paint.#MAX_SCALE;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
