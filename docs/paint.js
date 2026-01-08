@@ -281,27 +281,27 @@ class Paint {
         this.#repaint = true;
 
         // Background renderer
-        this.setObject(0, 0, 0, 1, 0, () => (x, y, scale, angle) => {
-            this.#context.fillStyle = "rgba(0, 0, 0, 0)";
-            this.#context.fillRect(0, 0, this.#view.width, this.#view.height);
+        this.setObject(0, 0, 0, 1, 0, () => (context, x, y, scale, angle) => {
+            context.fillStyle = "rgba(0, 0, 0, 0)";
+            context.fillRect(0, 0, this.#view.width, this.#view.height);
         });
 
         // layer renderer
-        this.setObject(10, 0, 0, 1, 0, (x, y, scale, angle) => {
-            this.#context.translate(this.#offsetX, this.#offsetY);
-            this.#context.rotate(angle * Paint.#RADIAN);
-            this.#context.scale(scale, scale);
-            this.#context.translate(x - this.#offsetX, y - this.#offsetY);
-            this.#context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
-            this.#context.resetTransform();
+        this.setObject(10, 0, 0, 1, 0, (context, x, y, scale, angle) => {
+            context.translate(this.#offsetX, this.#offsetY);
+            context.rotate(angle * Paint.#RADIAN);
+            context.scale(scale, scale);
+            context.translate(x - this.#offsetX, y - this.#offsetY);
+            context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
+            context.resetTransform();
         });
 
         //Grid renderer
-        this.setObject(20, 0, 0, 1, 0, (x, y, scale, angle) => {
-            this.#context.translate(this.#offsetX, this.#offsetY);
-            this.#context.rotate(angle * Paint.#RADIAN);
-            this.#context.scale(scale, scale);
-            this.#context.translate(x - this.#offsetX + 0.5, y - this.#offsetY + 0.5);
+        this.setObject(20, 0, 0, 1, 0, (context, x, y, scale, angle) => {
+            context.translate(this.#offsetX, this.#offsetY);
+            context.rotate(angle * Paint.#RADIAN);
+            context.scale(scale, scale);
+            context.translate(x - this.#offsetX + 0.5, y - this.#offsetY + 0.5);
 
             this.#bindObject(10);
 
@@ -310,22 +310,22 @@ class Paint {
             const columns = width / Paint.#MAX_SCALE;
             const rows = height / Paint.#MAX_SCALE;
 
-            this.#context.strokeStyle = "rgba(255, 255, 255, 0.25)";
-            this.#context.lineWidth = 1;
-            this.#context.beginPath();
+            context.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            context.lineWidth = 1;
+            context.beginPath();
             
             for (let i = 0; i < columns; ++i) {
-                this.#context.moveTo(i * Paint.#MAX_SCALE, 0);
-                this.#context.lineTo(i * Paint.#MAX_SCALE, height);
+                context.moveTo(i * Paint.#MAX_SCALE, 0);
+                context.lineTo(i * Paint.#MAX_SCALE, height);
             }
 
             for (let i = 0; i < rows; ++i) {
-                this.#context.moveTo(0, i * Paint.#MAX_SCALE);
-                this.#context.lineTo(width, i * Paint.#MAX_SCALE);
+                context.moveTo(0, i * Paint.#MAX_SCALE);
+                context.lineTo(width, i * Paint.#MAX_SCALE);
             }
 
-            this.#context.stroke();
-            this.#context.resetTransform();
+            context.stroke();
+            context.resetTransform();
 
             postMessage({
                 type: "message",
@@ -363,7 +363,7 @@ class Paint {
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
         this.#modifiers.forEach(modifier => modifier());
-        this.#objects.forEach(object => object.renderer(object.x, object.y, object.scale, object.angle));
+        this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.scale, object.angle));
     }
 
     repaint() {
