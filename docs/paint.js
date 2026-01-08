@@ -293,7 +293,6 @@ class Paint {
         this.setObject(20, 0, 0, 1, 0, (context, x, y, scale, angle) => {
             context.translate(this.vcx, this.vcy);
             context.rotate(angle * Paint.#RADIAN);
-            context.scale(scale, scale);
             context.translate(x - this.vcx, y - this.vcy);
 
             this.#bindObject(10);
