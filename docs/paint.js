@@ -294,7 +294,7 @@ class Paint {
             context.translate(this.vcx, this.vcy);
             context.rotate(angle * Paint.#RADIAN);
             context.scale(scale, scale);
-            context.translate(x - this.vcx + 0.5, y - this.vcy + 0.5);
+            context.translate(x - this.vcx, y - this.vcy);
 
             this.#bindObject(10);
 
@@ -319,11 +319,6 @@ class Paint {
 
             context.stroke();
             context.resetTransform();
-
-            postMessage({
-                type: "message",
-                message: "グリッドがレンダリングされました！"
-            });
         });
 
         this.addFunction("grid", () => {
@@ -355,7 +350,7 @@ class Paint {
 
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
-        this.#functions.forEach(modifier => modifier());
+        this.#functions.forEach(execution => execution());
         this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.scale, object.angle));
     }
 
@@ -379,19 +374,19 @@ class Paint {
         this.repaint();
     }
 
-    scaleObject(index = 0, scale = 0) {
+    scaleObject(index = 0, dScale = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.scale *= scale;
+        this.#bindingObject.scale *= dScale;
         this.#bindingObject.scale = Math.min(Paint.#MAX_SCALE, Math.max(this.#bindingObject.scale, Paint.#MIN_SCALE));
 
         this.repaint();
     }
 
-    rotateObject(index = 0, angle = 0) {
+    rotateObject(index = 0, dAngle = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.angle += angle;
+        this.#bindingObject.angle += dAngle;
         this.#bindingObject.angle %= 360;
 
         this.repaint();
@@ -560,7 +555,7 @@ onmessage = event => {
             paint.scaleObject(event.data.index, event.data.dScale);
 
             break;
-        case "ratote":
+        case "rotate":
             paint.rotateObject(event.data.index, event.data.dAngle);
 
             break;
