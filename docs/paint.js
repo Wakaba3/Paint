@@ -321,12 +321,7 @@ class Paint {
             context.stroke();
 
             context.strokeStyle = "rgba(128, 128, 128, 255)";
-            context.beginPath();
-            context.moveTo(0, 0);
-            context.lineTo(0, height - 1);
-            context.lineTo(width - 1, height - 1);
-            context.lineTo(width - 1, 0);
-            context.lineTo(0, 0);
+            context.rect(0, 0, width - 1, height - 1);
             context.stroke();
 
             context.resetTransform();
