@@ -386,7 +386,7 @@ class Paint {
     rotateObject(index = 0, dAngle = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.angle += dAngle;
+        this.#bindingObject.angle -= dAngle;
         this.#bindingObject.angle %= 360;
 
         this.repaint();
