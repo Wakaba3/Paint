@@ -433,15 +433,15 @@ class Paint {
         };
     }
 
-    setObject(index = 0, x = 0, y = 0, scale = 1, angle = 0, renderer = () => {}) {
+    setObject(index = 0, x, y, scale, angle, renderer) {
         let object = this.#objects[index];
 
         if (object) {
-            object.x = x;
-            object.y = y;
-            object.scale = scale;
-            object.angle = angle;
-            object.renderer = renderer;
+            object.x = Number.isFinite(x) ? x : object.x;
+            object.y = Number.isFinite(y) ? y : object.y;
+            object.scale = Number.isFinite(scale) ? scale : object.scale;
+            object.angle = Number.isFinite(angle) ? angle : object.angle;
+            object.renderer = renderer instanceof Function ? renderer : object.renderer;
         } else {
             object = this.createObject(x, y, scale, angle, renderer);
         }
