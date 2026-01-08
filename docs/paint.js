@@ -253,11 +253,11 @@ class Paint {
     #backgroundColor;
 
     #objectList;
-    #modifierList;
+    #modifiers;
     #bindingIndex;
     #bindingObject;
 
-    #imageBuffer;
+    #buffers;
 
     #renderer;
     #repaint;
@@ -273,11 +273,11 @@ class Paint {
         this.#offsetY = view.height / 2;
 
         this.#objectList = new Array();
-        this.#modifierList = new Map();
+        this.#modifiers = new Map();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
 
-        this.#imageBuffer = new Map();
+        this.#buffers = new Map();
         this.#repaint = true;
 
         // Background renderer
@@ -358,7 +358,7 @@ class Paint {
 
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
-        this.#modifierList.forEach(modifier => modifier.modify());
+        this.#modifiers.forEach(modifier => modifier());
         this.#objectList.forEach(object => object.renderer(object.x, object.y, object.scale, object.angle));
     }
 
@@ -460,18 +460,18 @@ class Paint {
     }
 
     addModifier(name = "", modifier = () => {}) {
-        this.#modifierList.set(name, modifier);
+        this.#modifiers.set(name, modifier);
     }
 
     removeModifier(name = "") {
-        this.#modifierList.delete(name);
+        this.#modifiers.delete(name);
     }
 
     #registerBuffer(name = "", image = null) {
         if (image) {
             this.#closeBuffer(name);
 
-            this.#imageBuffer.set(name, image);
+            this.#buffers.set(name, image);
         }
 
         return image;
@@ -479,14 +479,14 @@ class Paint {
 
 
     #closeBuffer(name = "") {
-        const image = this.#imageBuffer.get(name);
+        const image = this.#buffers.get(name);
 
         if (image) {
             if (image instanceof ImageBitmap) {
                 image.close();
             }
 
-            this.#imageBuffer.delete(name);
+            this.#buffers.delete(name);
         }
     }
 
@@ -548,15 +548,15 @@ onmessage = event => {
 
             break;
         case "translate":
-            paint.translate(event.data.index, event.data.dx, event.data.dy);
+            paint.translateObject(event.data.index, event.data.dx, event.data.dy);
 
             break;
         case "scale":
-            paint.scale(event.data.index, event.data.dScale);
+            paint.scaleObject(event.data.index, event.data.dScale);
 
             break;
         case "ratote":
-            paint.rotate(event.data.index, event.data.dAngle);
+            paint.rotateObject(event.data.index, event.data.dAngle);
 
             break;
         default:
