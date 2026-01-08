@@ -326,6 +326,11 @@ class Paint {
 
             this.#context.stroke();
             this.#context.resetTransform();
+
+            postMessage({
+                type: "message",
+                message: "グリッドがレンダリングされました！"
+            });
         });
 
         this.addModifier(() => {
