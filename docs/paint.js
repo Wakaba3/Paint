@@ -443,7 +443,7 @@ class Paint {
             object.angle = angle;
             object.renderer = renderer;
         } else {
-            object = this.createObject(x, y, scale, angle);
+            object = this.createObject(x, y, scale, angle, renderer);
         }
 
         if (index >= this.#objects.length) {
@@ -458,7 +458,7 @@ class Paint {
     }
 
     removeObject(index = 0) {
-        this.#objects.splice(index, 1);
+        this.#objects.splice(index, 1, this.createObject());
 
         this.repaint();
     }
