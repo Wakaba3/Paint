@@ -275,7 +275,7 @@ class Paint {
 
         // Background renderer
         this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle) => {
-            context.fillStyle = "rgba(0, 0, 0, 0%)";
+            context.fillStyle = "rgba(0, 0, 0, 0)";
             context.fillRect(0, 0, width, height);
         });
 
@@ -298,7 +298,7 @@ class Paint {
             const columns = width / Paint.#MAX_SCALE;
             const rows = height / Paint.#MAX_SCALE;
 
-            context.strokeStyle = "rgba(255, 255, 255, 25%)";
+            context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
             context.translate(this.#view.width / 2 + (x - this.#view.width / 2) * scale + width / 2, this.#view.height / 2 + (y - this.#view.height / 2) * scale + height / 2);
             context.rotate(angle * Paint.#RADIAN);
@@ -308,14 +308,14 @@ class Paint {
             for (let i = 1; i < columns; ++i) {
                 if ((i & 7) === 0) {
                     context.stroke();
-                    context.strokeStyle = "rgba(192, 192, 192, 100%)";
+                    context.strokeStyle = "rgba(192, 192, 192, 1)";
                     context.beginPath();
 
                     context.moveTo(i * Paint.#MAX_SCALE, 0);
                     context.lineTo(i * Paint.#MAX_SCALE, height - 1);
 
                     context.stroke();
-                    context.strokeStyle = "rgba(255, 255, 255, 25%)";
+                    context.strokeStyle = "rgba(255, 255, 255, 0.25)";
                     context.beginPath();
                 } else {
                     context.moveTo(i * Paint.#MAX_SCALE, 0);
@@ -326,14 +326,14 @@ class Paint {
             for (let i = 1; i < rows; ++i) {
                 if ((i & 7) === 0) {
                     context.stroke();
-                    context.strokeStyle = "rgba(192, 192, 192, 100%)";
+                    context.strokeStyle = "rgba(192, 192, 192, 1)";
                     context.beginPath();
 
                     context.moveTo(0, i * Paint.#MAX_SCALE);
                     context.lineTo(width - 1, i * Paint.#MAX_SCALE);
 
                     context.stroke();
-                    context.strokeStyle = "rgba(255, 255, 255, 25%)";
+                    context.strokeStyle = "rgba(255, 255, 255, 0.25)";
                     context.beginPath();
                 } else {
                     context.moveTo(0, i * Paint.#MAX_SCALE);
@@ -342,7 +342,7 @@ class Paint {
             }
 
             context.stroke();
-            context.strokeStyle = "rgba(192, 192, 192, 100%)";
+            context.strokeStyle = "rgba(192, 192, 192, 1)";
             context.rect(0, 0, width - 1, height - 1);
             context.stroke();
             context.resetTransform();
@@ -350,7 +350,7 @@ class Paint {
 
         // Cross renderer
         this.setObject(30, this.#view.width / 2, this.#view.height / 2, 0, 0, 1, 0, (context, x, y) => {
-            context.strokeStyle = "rgba(192, 192, 192, 100%)";
+            context.strokeStyle = "rgba(192, 192, 192, 1)";
             context.beginPath();
             context.moveTo(x + 8, y);
             context.lineTo(x - 8, y);
