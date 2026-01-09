@@ -1,6 +1,6 @@
 :root {
-    --background-color: rgb(32, 32, 32);
-    --foreground-color: rgb(128, 128, 128);
+    --background-color: rgb(32 32 32);
+    --foreground-color: rgb(128 128 128);
 
     background-color: var(--background-color);
 }
@@ -9,7 +9,7 @@
     pointer-events: none;
     font: 100% serif;
     text-wrap: nowrap;
-    color: rgb(255, 255, 255);
+    color: rgb(255 255 255);
 }
 
 html, body {
