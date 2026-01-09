@@ -74,8 +74,6 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("keydown", event => {
-    console.log(event);
-
     if (event.target !== document.body)
         return;
 
@@ -112,6 +110,10 @@ addEventListener("keydown", event => {
 addEventListener("keyup", event => {
     keys.delete(event.key);
 });
+
+addEventListener("pointerdown", event => {
+    console.log(event);
+})
 
 function importImages(files = []) {
     if (files.length <= 0)
