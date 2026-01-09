@@ -11,13 +11,6 @@ const sizeHeight = document.getElementById("size-height");
 const points = new Map();
 const keys = new Set();
 
-worker.postMessage({
-    type: "init",
-    view: view,
-    width: 768,
-    height: 1024
-}, [view]);
-
 worker.onmessage = event => {
     switch (event.data.type) {
         case "init":
@@ -45,6 +38,13 @@ worker.onmessage = event => {
             break;
     }
 };
+
+worker.postMessage({
+    type: "init",
+    view: view,
+    width: 768,
+    height: 1024
+}, [view]);
 
 // Prevent right clicking
 addEventListener("contextmenu", event => event.preventDefault(), { passive: false });
