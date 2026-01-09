@@ -2,6 +2,11 @@ const worker = new Worker("paint.js");
 
 const view = document.getElementById("view").transferControlToOffscreen();
 
+const undo = document.getElementById("undo");
+const redo = document.getElementById("redo");
+const zoomOut = document.getElementById("zoom-out");
+const zoomIn = document.getElementById("zoom-in");
+
 const importChooser = document.getElementById("import-chooser");
 
 const sizeWidth = document.getElementById("size-width");
@@ -24,6 +29,11 @@ worker.onmessage = event => {
 
             return;
         case "repaint":
+            undo.style.pointerEvents = event.data.canvas.canUndo ? "auto" : "none";
+            redo.style.pointerEvents = event.data.canvas.canRedo ? "auto" : "none";
+            zoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
+            zoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
+            
             return;
         case "message":
             showMessage(event.data.message);

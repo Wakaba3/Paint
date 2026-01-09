@@ -225,6 +225,13 @@ class Canvas {
         });
     }
 
+    get info() {
+        return {
+            canUndo: this.#bindingRecord > 0,
+            canRedo: this.#bindingRecord < this.#records.length - 1
+        };
+    }
+
     get context() {
         return this.#canvas.context;
     }
@@ -419,12 +426,15 @@ class Paint {
 
         postMessage({
             type: "repaint",
+            canvas: this.#canvas.info,
             x: this.#bindingObject.x,
             y: this.#bindingObject.y,
             width: this.#bindingObject.width,
             height: this.#bindingObject.height,
             scale: this.#bindingObject.scale,
             angle: this.#bindingObject.angle,
+            canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE,
+            canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE,
         });
     }
 
@@ -575,6 +585,10 @@ class Paint {
         }
     }
 
+    get canvas() {
+        return this.#canvas;
+    }
+
     get width() {
         return this.#canvas.width;
     }
@@ -629,6 +643,16 @@ onmessage = event => {
             return;
         case "set":
             Paint.INSTANCE.setObject(event.data.index, event.data.x, event.data.y, event.data.width, event.data.height, event.data.scale, event.data.angle);
+
+            return;
+        case "undo":
+            Paint.INSTANCE.canvas.undo();
+            Paint.INSTANCE.repaint();
+
+            return;
+        case "redo":
+            Paint.INSTANCE.canvas.redo();
+            Paint.INSTANCE.repaint();
 
             return;
         default:
