@@ -339,8 +339,6 @@ class Paint {
                     context.strokeStyle = "rgb(255 255 255 / 0.25)";
                     context.beginPath();
                 } else {
-                    console.log(i + ": " + context.strokeStyle);
-
                     context.moveTo(0, i * Paint.#MAX_SCALE);
                     context.lineTo(width - 1, i * Paint.#MAX_SCALE);
                 }
