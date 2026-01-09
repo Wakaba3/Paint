@@ -300,7 +300,7 @@ class Paint {
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
             postMessage({
                 type: "message",
-                message: `グリッドを描画（幅、高さ）＝（${width}、 ${height}）`
+                message: `グリッドを描画（幅、高さ）＝（${this.#view.width}、 ${this.#view.height}）`
             });
 
             width *= scale;
