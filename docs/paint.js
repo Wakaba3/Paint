@@ -298,11 +298,6 @@ class Paint {
 
         // Grid renderer
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
-            postMessage({
-                type: "message",
-                message: `グリッドを描画（幅、高さ）＝（${this.#view.width}、 ${this.#view.height}）`
-            });
-
             width *= scale;
             height *= scale;
 
@@ -415,6 +410,7 @@ class Paint {
 
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
+        this.#context.beginPath();
         this.#functions.forEach(execution => execution());
         this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.width, object.height, object.scale, object.angle));
     }
