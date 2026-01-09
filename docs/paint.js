@@ -281,11 +281,9 @@ class Paint {
 
         // layer renderer
         this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
-            width *= scale;
-            height *= scale;
-
-            context.translate(x + width / 2, y + height / 2);
+            context.translate(this.#view.width / 2, this.#view.height / 2);
             context.scale(scale, scale);
+            context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
             context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
@@ -296,34 +294,37 @@ class Paint {
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
             width *= scale;
             height *= scale;
-
-            context.translate(x + width / 2, y + height / 2);
-            context.rotate(angle * Paint.#RADIAN);
-            context.translate(width / -2, height / -2);
+            angle *= Paint.#RADIAN;
 
             const columns = (width - 1) / Paint.#MAX_SCALE;
             const rows = (height - 1) / Paint.#MAX_SCALE;
+            const dx = x - this.#view.width / 2;
+            const dy = y - this.#view.height / 2;
+            const xRot = Math.cos(angle) * -Math.sin(angle);
+            const yRot = Math.sin(angle) * Math.cos(angle);
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
             context.beginPath();
-            
-            for (let i = 1; i < columns; ++i) {
-                context.moveTo(i * Paint.#MAX_SCALE, 0);
-                context.lineTo(i * Paint.#MAX_SCALE, height - 1);
+
+            for (let i = 0; i < columns; ++i) {
+                context.moveTo((dx + i * Paint.#MAX_SCALE) * xRot, dy * yRot);
+                context.lineTo((dx + i * Paint.#MAX_SCALE) * xRot, (dy + height - 1) * yRot);
             }
 
-            for (let i = 1; i < rows; ++i) {
-                context.moveTo(0, i * Paint.#MAX_SCALE);
-                context.lineTo(width - 1, i * Paint.#MAX_SCALE);
+            for (let i = 0; i < rows; ++i) {
+                context.moveTo(dx * xRot, (dy + i * Paint.#MAX_SCALE) * yRot);
+                context.moveTo((dx + width - 1) * xRot, (dy + i * Paint.#MAX_SCALE) * yRot);
             }
 
             context.stroke();
 
-            context.strokeStyle = "rgba(128, 128, 128, 255)";
+            context.strokeStyle = "rgb(128, 128, 128)";
+            context.translate(x + width / 2, y + height / 2);
+            context.rotate(angle);
+            context.translate(width / -2, height / -2);
             context.rect(0, 0, width - 1, height - 1);
             context.stroke();
-
             context.resetTransform();
         });
 
@@ -496,7 +497,6 @@ class Paint {
 
         return image;
     }
-
 
     #closeBuffer(name = "") {
         const image = this.#buffers.get(name);
