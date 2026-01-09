@@ -377,8 +377,8 @@ class Paint {
     translateObject(index = 0, dx = 0, dy = 0) {
         this.#bindObject(index);
 
-        this.#bindingObject.x += Number.isFinite(dx) ? dx : 0;
-        this.#bindingObject.y += Number.isFinite(dy) ? dy : 0;
+        this.#bindingObject.x += Number.isFinite(dx) ? dx * Math.max(1, Paint.#MAX_SCALE / this.#bindingObject.scale) : 0;
+        this.#bindingObject.y += Number.isFinite(dy) ? dy * Math.max(1, Paint.#MAX_SCALE / this.#bindingObject.scale) : 0;
 
         this.repaint();
     }
