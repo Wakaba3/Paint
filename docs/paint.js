@@ -290,7 +290,7 @@ class Paint {
             context.resetTransform();
         });
 
-        //Grid renderer
+        // Grid renderer
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
             width *= scale;
             height *= scale;
@@ -349,10 +349,25 @@ class Paint {
             context.resetTransform();
         });
 
+        // Cross renderer
+        this.setObject(30, this.#view.width / 2, this.#view.height / 2, 0, 0, 1, 0, (context, x, y) => {
+            context.strokeStyle = "rgb(192, 192, 192)";
+            context.beginPath();
+            context.moveTo(x + 8, y);
+            context.lineTo(x - 8, y);
+            context.moveTo(x, y - 8);
+            context.lineTo(x, y + 8);
+            context.stroke();
+        });
+
         this.addFunction("grid-setup", () => {
             this.resizeObject(10, this.width, this.height);
             this.imitateObject(10, 20);
         });
+
+        this.addFunction("cross-setup", () => {
+            this.locateObject(10, this.#view.width / 2, this.#view.height / 2);
+        })
     }
 
     resize(width = 0, height = 0) {
@@ -398,6 +413,15 @@ class Paint {
             this.#bindingIndex = index;
             this.#bindingObject = this.#getObject(index);
         }
+    }
+
+    locateObject(index = 0, x = 0, y = 0) {
+        this.#bindObject(index);
+
+        this.#bindingObject.x = x;
+        this.#bindingObject.y = y;
+
+        this.repaint();
     }
 
     translateObject(index = 0, dx = 0, dy = 0) {
