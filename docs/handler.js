@@ -30,9 +30,13 @@ worker.onmessage = event => {
             return;
         case "repaint":
             undo.style.pointerEvents = event.data.canvas.canUndo ? "auto" : "none";
+            undo.style.color = event.data.canvas.canUndo ? "" : "var(--foreground-color)";
             redo.style.pointerEvents = event.data.canvas.canRedo ? "auto" : "none";
+            redo.style.color = event.data.canvas.canRedo ? "" : "var(--foreground-color)";
             zoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
+            zoomOut.style.color = event.data.canvas.canZoomOut ? "" : "var(--foreground-color)";
             zoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
+            zoomIn.style.color = event.data.canvas.canZoomIn ? "" : "var(--foreground-color)";
             
             return;
         case "message":
