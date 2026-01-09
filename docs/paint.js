@@ -239,6 +239,8 @@ class Canvas {
 }
 
 class Paint {
+    static INSTANCE;
+
     static #MIN_SCALE = 2 ** -3;
     static #MAX_SCALE = 2 ** 6;
     static #RADIAN = Math.PI / 180;
@@ -369,6 +371,8 @@ class Paint {
         this.addFunction("cross-setup", () => {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
+
+        paint.run();
     }
 
     resize(width = 0, height = 0) {
@@ -577,71 +581,54 @@ class Paint {
     }
 }
 
-let paint = null;
-
 onmessage = event => {
-    event.data.type = String(event.data.type);
-
-    if (event.data.type === "init") {
-        paint = new Paint(event.data.view, event.data.width, event.data.height);
-        paint.run();
-
-        postMessage({
-            type: "init",
-            width: paint.width,
-            height: paint.height,
-            successful: paint instanceof Paint
-        });
-    } else if (!paint) {
-        postMessage({
-            type: "error",
-            error: "Paint is not initialized!"
-        });
-
-        return;
-    }
-
     switch (event.data.type) {
         case "init":
-            paint = new Paint(event.data.view, event.data.width, event.data.height);
-            paint.run();
+            Paint.INSTANCE = new Paint(event.data.view, event.data.width, event.data.height);
 
-            postMessage({
-                type: "init",
-                width: paint.width,
-                height: paint.height,
-                successful: paint instanceof Paint
-            });
+            if (Paint.INSTANCE instanceof Paint) {
+                postMessage({
+                    type: "init",
+                    width: paint.width,
+                    height: paint.height,
+                    successful: true
+                });
+            } else {
+                postMessage({
+                    type: "error",
+                    error: "ペイントを初期化できませんでした！"
+                });
+            }
 
-            break;
+            return;
         case "resize":
-            const successful = paint.resize(event.data.width, event.data.height)
+            const successful = Paint.INSTANCE.resize(event.data.width, event.data.height)
 
             postMessage({
                 type: "resize",
-                width: paint.width,
-                height: paint.height,
+                width: Paint.INSTANCE.width,
+                height: Paint.INSTANCE.height,
                 successful: successful
             });
 
-            break;
+            return;
         case "translate":
-            paint.translateObject(event.data.index, event.data.dx, event.data.dy);
+            Paint.INSTANCE.translateObject(event.data.index, event.data.dx, event.data.dy);
 
-            break;
+            return;
         case "scale":
-            paint.scaleObject(event.data.index, event.data.dScale);
+            Paint.INSTANCE.scaleObject(event.data.index, event.data.dScale);
 
-            break;
+            return;
         case "rotate":
-            paint.rotateObject(event.data.index, event.data.dAngle);
+            Paint.INSTANCE.rotateObject(event.data.index, event.data.dAngle);
 
-            break;
+            return;
         case "set":
-            paint.setObject(event.data.index, event.data.x, event.data.y, event.data.width, event.data.height, event.data.scale, event.data.angle);
+            Paint.INSTANCE.setObject(event.data.index, event.data.x, event.data.y, event.data.width, event.data.height, event.data.scale, event.data.angle);
 
-            break;
+            return;
         default:
-            break;
+            return;
     }
 }

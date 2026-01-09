@@ -8,6 +8,7 @@ const importChooser = document.getElementById("import-chooser");
 const sizeWidth = document.getElementById("size-width");
 const sizeHeight = document.getElementById("size-height");
 
+const points = new Map();
 const keys = new Set();
 
 worker.postMessage({
@@ -73,6 +74,16 @@ addEventListener("panelclose", event => {
     }
 });
 
+addEventListener("pointerdown", event => {
+    console.log(event);
+})
+
+addEventListener("pointermove", event => {
+});
+
+addEventListener("pointerup", event => {
+});
+
 addEventListener("keydown", event => {
     if (event.target !== document.body)
         return;
@@ -110,10 +121,6 @@ addEventListener("keydown", event => {
 addEventListener("keyup", event => {
     keys.delete(event.key);
 });
-
-addEventListener("pointerdown", event => {
-    console.log(event);
-})
 
 function importImages(files = []) {
     if (files.length <= 0)
