@@ -292,18 +292,14 @@ class Paint {
 
         //Grid renderer
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
-            width *= scale;
-            height *= scale;
-            angle *= Paint.#RADIAN;
-
             const columns = (width - 1) / Paint.#MAX_SCALE;
             const rows = (height - 1) / Paint.#MAX_SCALE;
             const ox = this.#view.width / 2;
             const oy = this.#view.height / 2;
             const dx = x - ox;
             const dy = y - oy;
-            const cos = Math.cos(angle);
-            const sin = Math.sin(angle);
+            const cos = Math.cos(angle * Paint.#RADIAN);
+            const sin = Math.sin(angle * Paint.#RADIAN);
 
             let vx0, vy0, vx1, vy1;
 
@@ -317,8 +313,8 @@ class Paint {
                 vx1 = dx + i * Paint.#MAX_SCALE;
                 vy1 = dy + height - 1;
 
-                context.moveTo(ox + vx0 * cos + vy0 * -sin, oy + vx0 * sin + vy0 * cos);
-                context.lineTo(ox + vx1 * cos + vy1 * -sin, oy + vx1 * sin + vy1 * cos);
+                context.moveTo(ox + (vx0 * cos + vy0 * -sin) * scale, (oy + vx0 * sin + vy0 * cos) * scale);
+                context.lineTo(ox + (vx1 * cos + vy1 * -sin) * scale, (oy + vx1 * sin + vy1 * cos) * scale);
             }
 
             for (let i = 0; i < rows; ++i) {
@@ -327,15 +323,15 @@ class Paint {
                 vx1 = dx + width - 1;
                 vy1 = dy + i * Paint.#MAX_SCALE;
 
-                context.moveTo(vx0 * cos + vy0 * -sin, vx0 * sin + vy0 * cos);
-                context.lineTo(vx1 * cos + vy1 * -sin, vx1 * sin + vy1 * cos);
+                context.moveTo(ox + (vx0 * cos + vy0 * -sin) * scale, (oy + vx0 * sin + vy0 * cos) * scale);
+                context.lineTo(ox + (vx1 * cos + vy1 * -sin) * scale, (oy + vx1 * sin + vy1 * cos) * scale);
             }
 
             context.stroke();
 
             context.strokeStyle = "rgb(128, 128, 128)";
             context.translate(x + width / 2, y + height / 2);
-            context.rotate(angle);
+            context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
             context.rect(0, 0, width - 1, height - 1);
             context.stroke();
