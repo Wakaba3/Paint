@@ -292,47 +292,32 @@ class Paint {
 
         //Grid renderer
         this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
+            width *= scale;
+            height *= scale;
+
             const columns = (width - 1) / Paint.#MAX_SCALE;
             const rows = (height - 1) / Paint.#MAX_SCALE;
-            const ox = this.#view.width / 2;
-            const oy = this.#view.height / 2;
-            const dx = x - ox;
-            const dy = y - oy;
-            const cos = Math.cos(angle * Paint.#RADIAN);
-            const sin = Math.sin(angle * Paint.#RADIAN);
-
-            let vx0, vy0, vx1, vy1;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
+            context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
+            context.rotate(angle * Paint.#RADIAN);
+            context.translate(width / -2, height / -2);
             context.beginPath();
 
             for (let i = 0; i < columns; ++i) {
-                vx0 = dx + i * Paint.#MAX_SCALE;
-                vy0 = dy;
-                vx1 = dx + i * Paint.#MAX_SCALE;
-                vy1 = dy + height - 1;
-
-                context.moveTo(ox + (vx0 * cos + vy0 * -sin) * scale, (oy + vx0 * sin + vy0 * cos) * scale);
-                context.lineTo(ox + (vx1 * cos + vy1 * -sin) * scale, (oy + vx1 * sin + vy1 * cos) * scale);
+                context.moveTo(i * Paint.#MAX_SCALE, 0);
+                context.lineTo(i * Paint.#MAX_SCALE, height - 1);
             }
 
             for (let i = 0; i < rows; ++i) {
-                vx0 = dx;
-                vy0 = dy + i * Paint.#MAX_SCALE;
-                vx1 = dx + width - 1;
-                vy1 = dy + i * Paint.#MAX_SCALE;
-
-                context.moveTo(ox + (vx0 * cos + vy0 * -sin) * scale, (oy + vx0 * sin + vy0 * cos) * scale);
-                context.lineTo(ox + (vx1 * cos + vy1 * -sin) * scale, (oy + vx1 * sin + vy1 * cos) * scale);
+                context.moveTo(0, i * Paint.#MAX_SCALE);
+                context.lineTo(width - 1, i * Paint.#MAX_SCALE);
             }
 
             context.stroke();
 
             context.strokeStyle = "rgb(128, 128, 128)";
-            context.translate(x + width / 2, y + height / 2);
-            context.rotate(angle * Paint.#RADIAN);
-            context.translate(width / -2, height / -2);
             context.rect(0, 0, width - 1, height - 1);
             context.stroke();
             context.resetTransform();
