@@ -300,7 +300,7 @@ class Paint {
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
-            context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
+            context.translate((x - this.#view.width / 2) * scale + width / 2, (y - this.#view.height / 2) * scale + height / 2);
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
             context.beginPath();
