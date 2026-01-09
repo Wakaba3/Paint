@@ -342,7 +342,7 @@ class Paint {
             }
 
             context.stroke();
-            context.strokeStyle = "rgb(192, 192, 192)";
+            context.strokeStyle = "rgba(192, 192, 192, 1)";
             context.rect(0, 0, width - 1, height - 1);
             context.stroke();
             context.resetTransform();
