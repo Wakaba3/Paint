@@ -1,7 +1,6 @@
 const worker = new Worker("paint.js");
 
 const view = document.getElementById("view").transferControlToOffscreen();
-let canvas;
 
 const importChooser = document.getElementById("import-chooser");
 
@@ -25,8 +24,6 @@ worker.onmessage = event => {
 
             break;
         case "repaint":
-            canvas = event.data;
-
             break;
         case "message":
             showMessage(event.data.message);
