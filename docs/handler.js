@@ -55,8 +55,6 @@ worker.postMessage({
     height: 1024
 }, [view]);
 
-requestAnimationFrame(() => worker.postMessage({ type: "repaint" }));
-
 // Prevent right clicking
 addEventListener("contextmenu", event => event.preventDefault(), { passive: false });
 

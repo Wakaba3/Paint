@@ -376,6 +376,8 @@ class Paint {
         this.addFunction("cross-setup", () => {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
+
+        this.repaint();
     }
 
     resize(width = 0, height = 0) {
@@ -603,6 +605,8 @@ onmessage = event => {
                     error: "ペイントを初期化できませんでした！"
                 });
             }
+
+            requestAnimationFrame(() => Paint.INSTANCE.repiant());
 
             return;
         case "resize":
