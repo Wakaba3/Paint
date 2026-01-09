@@ -295,14 +295,12 @@ class Paint {
             width *= scale;
             height *= scale;
 
-            const ox = this.#view.width / 2;
-            const oy = this.#view.height / 2;
             const columns = (width - 1) / Paint.#MAX_SCALE;
             const rows = (height - 1) / Paint.#MAX_SCALE;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
-            context.translate(ox + (x - ox) * scale + width / 2, oy + (y - oy) * scale + height / 2);
+            context.translate(this.#view.width / 2 + (x - this.#view.width / 2) * scale + width / 2, this.#view.height / 2 + (y - this.#view.height / 2) * scale + height / 2);
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
             context.beginPath();
