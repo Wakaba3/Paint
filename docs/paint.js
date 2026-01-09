@@ -410,7 +410,6 @@ class Paint {
 
     #render() {
         this.#context.clearRect(0, 0, this.#view.width, this.#view.height);
-        this.#context.beginPath();
         this.#functions.forEach(execution => execution());
         this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.width, object.height, object.scale, object.angle));
     }
@@ -641,6 +640,10 @@ onmessage = event => {
             return;
         case "redo":
             Paint.INSTANCE.canvas.redo();
+            Paint.INSTANCE.repaint();
+
+            return;
+        case "repaint":
             Paint.INSTANCE.repaint();
 
             return;
