@@ -305,14 +305,40 @@ class Paint {
             context.translate(width / -2, height / -2);
             context.beginPath();
 
-            for (let i = 0; i < columns; ++i) {
-                context.moveTo(i * Paint.#MAX_SCALE, 0);
-                context.lineTo(i * Paint.#MAX_SCALE, height - 1);
+            for (let i = 1; i < columns; ++i) {
+                if ((i & 7) === 0) {
+                    context.stroke();
+                    context.strokeStyle = "rgb(192, 192, 192)";
+                    context.beginPath();
+
+                    context.moveTo(i * Paint.#MAX_SCALE, 0);
+                    context.lineTo(i * Paint.#MAX_SCALE, height - 1);
+
+                    context.stroke();
+                    context.strokeStyle = "rgba(255, 255, 255, 0.25)";
+                    context.beginPath();
+                } else {
+                    context.moveTo(i * Paint.#MAX_SCALE, 0);
+                    context.lineTo(i * Paint.#MAX_SCALE, height - 1);
+                }
             }
 
-            for (let i = 0; i < rows; ++i) {
-                context.moveTo(0, i * Paint.#MAX_SCALE);
-                context.lineTo(width - 1, i * Paint.#MAX_SCALE);
+            for (let i = 1; i < rows; ++i) {
+                if ((i & 7) === 0) {
+                    context.stroke();
+                    context.strokeStyle = "rgb(192, 192, 192)";
+                    context.beginPath();
+
+                    context.moveTo(0, i * Paint.#MAX_SCALE);
+                    context.lineTo(width - 1, i * Paint.#MAX_SCALE);
+
+                    context.stroke();
+                    context.strokeStyle = "rgba(255, 255, 255, 0.25)";
+                    context.beginPath();
+                } else {
+                    context.moveTo(0, i * Paint.#MAX_SCALE);
+                    context.lineTo(width - 1, i * Paint.#MAX_SCALE);
+                }
             }
 
             context.stroke();
