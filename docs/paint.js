@@ -295,8 +295,8 @@ class Paint {
             width *= scale;
             height *= scale;
 
-            const columns = (width - 1) / Paint.#MAX_SCALE;
-            const rows = (height - 1) / Paint.#MAX_SCALE;
+            const columns = Math.floor((width - 1) / Paint.#MAX_SCALE);
+            const rows = Math.floor((height - 1) / Paint.#MAX_SCALE);
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
@@ -306,7 +306,7 @@ class Paint {
             context.beginPath();
 
             for (let i = 1; i < columns; ++i) {
-                if ((i & 7) === 0) {
+                if (i % 8 === 0) {
                     context.stroke();
                     context.strokeStyle = "rgb(192, 192, 192)";
                     context.beginPath();
@@ -324,7 +324,7 @@ class Paint {
             }
 
             for (let i = 1; i < rows; ++i) {
-                if ((i & 7) === 0) {
+                if (i % 8 === 0) {
                     context.stroke();
                     context.strokeStyle = "rgb(192, 192, 192)";
                     context.beginPath();
