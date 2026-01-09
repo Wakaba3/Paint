@@ -333,6 +333,7 @@ class Paint {
                     context.moveTo(0, i * Paint.#MAX_SCALE);
                     context.lineTo(width - 1, i * Paint.#MAX_SCALE);
 
+                    console.log(i + ": " + context.strokeStyle);
                     context.stroke();
                     context.strokeStyle = "rgba(255, 255, 255, 0.25)";
                     context.beginPath();
@@ -342,6 +343,7 @@ class Paint {
                 }
             }
 
+            console.log(i + ": " + context.strokeStyle);
             context.stroke();
             context.strokeStyle = "rgba(192, 192, 192, 1)";
             context.rect(0, 0, width - 1, height - 1);
