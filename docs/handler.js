@@ -55,7 +55,7 @@ worker.postMessage({
     height: 1024
 }, [view]);
 
-setTimeout(() => worker.postMessage({ type: "repaint" }), 1000);
+setTimeout(() => worker.postMessage({ type: "repaint" }), 0);
 
 // Prevent right clicking
 addEventListener("contextmenu", event => event.preventDefault(), { passive: false });
