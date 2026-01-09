@@ -366,7 +366,7 @@ class Paint {
         });
 
         this.addFunction("cross-setup", () => {
-            this.locateObject(10, this.#view.width / 2, this.#view.height / 2);
+            this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         })
     }
 
