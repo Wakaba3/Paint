@@ -367,6 +367,7 @@ class Paint {
             context.stroke();
         });
 
+        // Functions
         this.addFunction("grid-setup", () => {
             this.resizeObject(10, this.width, this.height);
             this.imitateObject(10, 20);
@@ -376,8 +377,11 @@ class Paint {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
 
-        this.repaint();
-        this.run();
+        //Run
+        setTimeout(() => {
+            this.repaint();
+            this.run();
+        }, 1);
     }
 
     resize(width = 0, height = 0) {
