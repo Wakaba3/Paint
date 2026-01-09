@@ -603,14 +603,7 @@ onmessage = event => {
         case "init":
             Paint.INSTANCE = new Paint(event.data.view, event.data.width, event.data.height);
 
-            if (Paint.INSTANCE instanceof Paint) {
-                postMessage({
-                    type: "init",
-                    width: Paint.INSTANCE.width,
-                    height: Paint.INSTANCE.height,
-                    successful: true
-                });
-            } else {
+            if (!(Paint.INSTANCE instanceof Paint)) {
                 postMessage({
                     type: "error",
                     error: "ペイントを初期化できませんでした！"
