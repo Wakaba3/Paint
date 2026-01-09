@@ -368,7 +368,7 @@ class Paint {
 
         this.addFunction("cross-setup", () => {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
-        })
+        });
     }
 
     resize(width = 0, height = 0) {
