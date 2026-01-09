@@ -74,6 +74,8 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("keydown", event => {
+    console.log(event);
+
     if (event.target !== document.body)
         return;
 
