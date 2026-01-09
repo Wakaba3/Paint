@@ -305,30 +305,30 @@ class Paint {
             const cos = Math.cos(angle);
             const sin = Math.sin(angle);
 
-            let x0, y0, x1, y1;
+            let vx0, vy0, vx1, vy1;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
             context.beginPath();
 
             for (let i = 0; i < columns; ++i) {
-                x0 = dx + i * Paint.#MAX_SCALE;
-                y0 = dy;
-                x1 = dx + i * Paint.#MAX_SCALE;
-                y1 = dy + height - 1;
+                vx0 = dx + i * Paint.#MAX_SCALE;
+                vy0 = dy;
+                vx1 = dx + i * Paint.#MAX_SCALE;
+                vy1 = dy + height - 1;
 
-                context.moveTo(x0 * cos + y0 * -sin, x0 * sin + y0 * cos);
-                context.lineTo(x1 * cos + y1 * -sin, x1 * sin + y1 * cos);
+                context.moveTo(ox + vx0 * cos + vy0 * -sin, oy + vx0 * sin + vy0 * cos);
+                context.lineTo(ox + vx1 * cos + vy1 * -sin, oy + vx1 * sin + vy1 * cos);
             }
 
             for (let i = 0; i < rows; ++i) {
-                x0 = dx;
-                y0 = dy + i * Paint.#MAX_SCALE;
-                x1 = dx + width - 1;
-                y1 = dy + i * Paint.#MAX_SCALE;
+                vx0 = dx;
+                vy0 = dy + i * Paint.#MAX_SCALE;
+                vx1 = dx + width - 1;
+                vy1 = dy + i * Paint.#MAX_SCALE;
 
-                context.moveTo(x0 * cos + y0 * -sin, x0 * sin + y0 * cos);
-                context.lineTo(x1 * cos + y1 * -sin, x1 * sin + y1 * cos);
+                context.moveTo(vx0 * cos + vy0 * -sin, vx0 * sin + vy0 * cos);
+                context.lineTo(vx1 * cos + vy1 * -sin, vx1 * sin + vy1 * cos);
             }
 
             context.stroke();
