@@ -333,14 +333,15 @@ class Paint {
                     context.lineTo(width - 1, i * Paint.#MAX_SCALE);
 
                     context.stroke();
+
+                    console.log(i + ": " + context.strokeStyle);
+
                     context.strokeStyle = "rgb(255 255 255 / 0.25)";
                     context.beginPath();
                 } else {
                     context.moveTo(0, i * Paint.#MAX_SCALE);
                     context.lineTo(width - 1, i * Paint.#MAX_SCALE);
                 }
-
-                console.log(i + ": " + context.strokeStyle);
             }
 
             context.stroke();
