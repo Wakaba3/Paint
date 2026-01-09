@@ -247,7 +247,6 @@ class Paint {
 
     #view;
     #context;
-    #buffer;
     #canvas;
 
     #objects;
@@ -264,7 +263,6 @@ class Paint {
         this.#view = view;
         this.#context = view.getContext("2d");
         this.#context.imageSmoothingEnabled = false;
-        this.#buffer = new Frame(view.width, view.height);
         this.#canvas = new Canvas(width, height);
 
         this.#objects = new Array();
@@ -273,7 +271,6 @@ class Paint {
         this.#bindingObject = null;
 
         this.#buffers = new Map();
-        this.#repaint = true;
 
         // Background renderer
         this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle) => {
@@ -372,6 +369,7 @@ class Paint {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
 
+        this.repaint();
         this.run();
     }
 
