@@ -350,7 +350,7 @@ class Paint {
 
         // Cross renderer
         this.setObject(30, this.#view.width / 2, this.#view.height / 2, 0, 0, 1, 0, (context, x, y) => {
-            context.strokeStyle = "rgb(192, 192, 192)";
+            context.strokeStyle = "rgba(192, 192, 192, 1)";
             context.beginPath();
             context.moveTo(x + 8, y);
             context.lineTo(x - 8, y);
