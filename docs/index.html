@@ -15,15 +15,22 @@
         <canvas id="view" width="800" height="800"></canvas>
 
         <div id="control-bar">
-            <div id="undo" translate="no">U</div>
-            <div id="redo" translate="no">R</div>
-            <div></div>
-            <div id="rotate-left" translate="no" onclick="rotateCanvas(30)">L</div>
-            <div id="rotate-right" translate="no" onclick="rotateCanvas(-30)">R</div>
-            <div></div>
-            <div id="zoom-out" translate="no" onclick="scaleCanvas(Math.SQRT1_2)">−</div>
-            <div id="zoom-in" translate="no" onclick="scaleCanvas(Math.SQRT2)">＋</div>
+            <div id="activity">
+                <div id="undo" translate="no">U</div>
+                <div id="redo" translate="no">R</div>
+            </div>
+            <div id="transform">
+                <div id="zoom">
+                    <div id="zoom-out" translate="no" onclick="scaleCanvas(Math.SQRT1_2)">−</div>
+                    <div id="zoom-in" translate="no" onclick="scaleCanvas(Math.SQRT2)">＋</div>
+                </div>
+                <div id="rotate">
+                    <div id="rotate-left" translate="no" onclick="rotateCanvas(30)">L</div>
+                    <div id="rotate-right" translate="no" onclick="rotateCanvas(-30)">R</div>
+                </div>
+            </div>
         </div>
+
         <div id="tool-bar">
             <div></div>
             <div></div>

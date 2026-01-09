@@ -47,19 +47,75 @@ html, body {
 }
 
 #control-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     position: absolute;
     left: 50%;
     top: 5%;
     transform: translate(-50%, 0%);
     padding: 10px;
+    width: 800px;
     height: 5%;
-    max-width: 100%;
+    max-width: 80%;
     max-height: 80px;
     aspect-ratio: 8 / 1;
     z-index: 1;
+}
+
+#activity {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    z-index: 2;
+    border-radius: 10px;
+}
+
+#undo,
+#redo {
+    pointer-events: auto;
+    flex: 1;
+    width: 30px;
+    padding: 5px;
+    text-align: center;
+    font-size: 125%;
+    border: thin solid var(--foreground-color);
+    border-radius: 10px;
+    background-color: var(--background-color);
+}
+
+#transform {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 1;
+    border-radius: 10px;
+}
+
+#zoom,
+#rotate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+#zoom-out,
+#zoom-in,
+#rotate-left,
+#rotate-right {
+    pointer-events: auto;
+    flex: 1;
+    width: 30px;
+    padding: 5px;
+    text-align: center;
+    font-size: 125%;
     border: thin solid var(--foreground-color);
     border-radius: 10px;
     background-color: var(--background-color);
@@ -75,7 +131,7 @@ html, body {
     transform: translate(-50%, -100%);
     padding: 10px;
     height: 5%;
-    max-width: 100%;
+    max-width: 80%;
     max-height: 80px;
     aspect-ratio: 8 / 1;
     z-index: 2;
@@ -84,7 +140,7 @@ html, body {
     background-color: var(--background-color);
 }
 
-#tool-bar > div, #control-bar > div {
+#tool-bar > * {
     pointer-events: auto;
     flex: 1;
     text-align: center;
@@ -146,8 +202,13 @@ html, body {
     color: black;
 }
 
-#tool-bar > div:active,
-#control-bar > div:active,
+#undo:active,
+#redo:active,
+#zoom-out:active,
+#zoom-in:active,
+#rotate-left:active,
+#rotate-right:active,
+#tool-bar > *:active,
 #import:active,
 #export:active,
 #size:active,

@@ -1,7 +1,7 @@
-const paint = new Worker("paint.js");
+const worker = new Worker("paint.js");
 
-const canvas = document.getElementById("view");
-const view = canvas.transferControlToOffscreen();
+const view = document.getElementById("view").transferControlToOffscreen();
+let canvas;
 
 const importChooser = document.getElementById("import-chooser");
 
@@ -10,14 +10,14 @@ const sizeHeight = document.getElementById("size-height");
 
 const keys = new Set();
 
-paint.postMessage({
+worker.postMessage({
     type: "init",
     view: view,
     width: 768,
     height: 1024
 }, [view]);
 
-paint.onmessage = event => {
+worker.onmessage = event => {
     switch (event.data.type) {
         case "init":
             break;
@@ -28,6 +28,10 @@ paint.onmessage = event => {
             if (event.data.successful) {
                 showMessage(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
             }
+
+            break;
+        case "repaint":
+            canvas = event.data;
 
             break;
         case "message":
@@ -126,7 +130,7 @@ function importImages(files = []) {
 }
 
 function resizeCanvas(width = 0, height = 0) {
-    paint.postMessage({
+    worker.postMessage({
         type: "resize",
         width: width,
         height: height
@@ -134,7 +138,7 @@ function resizeCanvas(width = 0, height = 0) {
 }
 
 function translateCanvas(dx = 0, dy = 0) {
-    paint.postMessage({
+    worker.postMessage({
         type: "translate",
         index: 10,
         dx: dx,
@@ -143,7 +147,7 @@ function translateCanvas(dx = 0, dy = 0) {
 }
 
 function scaleCanvas(dScale = 0) {
-    paint.postMessage({
+    worker.postMessage({
         type: "scale",
         index: 10,
         dScale: dScale
@@ -151,7 +155,7 @@ function scaleCanvas(dScale = 0) {
 }
 
 function rotateCanvas(dAngle = 0) {
-    paint.postMessage({
+    worker.postMessage({
         type: "rotate",
         index: 10,
         dAngle: dAngle

@@ -279,14 +279,14 @@ class Paint {
             context.fillRect(0, 0, width, height);
         });
 
-        // layer renderer
+        // Canvas renderer
         this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
             context.translate(this.#view.width / 2, this.#view.height / 2);
             context.scale(scale, scale);
             context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
-            context.drawImage(this.#registerBuffer("layers", this.#canvas.composite()), 0, 0);
+            context.drawImage(this.#registerBuffer("canvas", this.#canvas.composite()), 0, 0);
             context.resetTransform();
         });
 
@@ -407,6 +407,18 @@ class Paint {
 
     repaint() {
         this.#repaint = true;
+
+        this.#bindObject(10);
+
+        postMessage({
+            type: "repaint",
+            x: this.#bindingObject.x,
+            y: this.#bindingObject.y,
+            width: this.#bindingObject.width,
+            height: this.#bindingObject.height,
+            scale: this.#bindingObject.scale,
+            angle: this.#bindingObject.angle,
+        });
     }
 
     #bindObject(index = 0) {
@@ -623,6 +635,10 @@ onmessage = event => {
             break;
         case "rotate":
             paint.rotateObject(event.data.index, event.data.dAngle);
+
+            break;
+        case "set":
+            paint.setObject(event.data.index, event.data.x, event.data.y, event.data.width, event.data.height, event.data.scale, event.data.angle);
 
             break;
         default:
