@@ -74,6 +74,8 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("keydown", event => {
+    console.log(event);
+
     keys.add(event.key);
 
     let dx = 0, dy = 0, mScale = 1;
