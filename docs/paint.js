@@ -298,23 +298,37 @@ class Paint {
 
             const columns = (width - 1) / Paint.#MAX_SCALE;
             const rows = (height - 1) / Paint.#MAX_SCALE;
-            const dx = x - this.#view.width / 2;
-            const dy = y - this.#view.height / 2;
-            const xRot = Math.cos(angle) * -Math.sin(angle);
-            const yRot = Math.sin(angle) * Math.cos(angle);
+            const ox = this.#view.width / 2;
+            const oy = this.#view.height / 2;
+            const dx = x - ox;
+            const dy = y - oy;
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+
+            let x0, y0, x1, y1;
 
             context.strokeStyle = "rgba(255, 255, 255, 0.25)";
             context.lineWidth = 1;
             context.beginPath();
 
             for (let i = 0; i < columns; ++i) {
-                context.moveTo((dx + i * Paint.#MAX_SCALE) * xRot, dy * yRot);
-                context.lineTo((dx + i * Paint.#MAX_SCALE) * xRot, (dy + height - 1) * yRot);
+                x0 = dx + i * Paint.#MAX_SCALE;
+                y0 = dy;
+                x1 = dx + i * Paint.#MAX_SCALE;
+                y1 = dy + height - 1;
+
+                context.moveTo(x0 * cos + y0 * -sin, x0 * sin + y0 * cos);
+                context.lineTo(x1 * cos + y1 * -sin, x1 * sin + y1 * cos);
             }
 
             for (let i = 0; i < rows; ++i) {
-                context.moveTo(dx * xRot, (dy + i * Paint.#MAX_SCALE) * yRot);
-                context.moveTo((dx + width - 1) * xRot, (dy + i * Paint.#MAX_SCALE) * yRot);
+                x0 = dx;
+                y0 = dy + i * Paint.#MAX_SCALE;
+                x1 = dx + width - 1;
+                y1 = dy + i * Paint.#MAX_SCALE;
+
+                context.moveTo(x0 * cos + y0 * -sin, x0 * sin + y0 * cos);
+                context.lineTo(x1 * cos + y1 * -sin, x1 * sin + y1 * cos);
             }
 
             context.stroke();
