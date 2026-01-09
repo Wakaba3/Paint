@@ -13,7 +13,7 @@ const keys = new Set();
 worker.onmessage = event => {
     switch (event.data.type) {
         case "init":
-            break;
+            return;
         case "resize":
             sizeWidth.value = event.data.width;
             sizeHeight.value = event.data.height;
@@ -22,17 +22,17 @@ worker.onmessage = event => {
                 showMessage(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
             }
 
-            break;
+            return;
         case "repaint":
-            break;
+            return;
         case "message":
             showMessage(event.data.message);
 
-            break;
+            return;
         case "error":
             throw new Error(event.data.error);
 
-            break;
+            return;
     }
 };
 
