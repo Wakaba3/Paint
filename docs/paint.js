@@ -589,8 +589,8 @@ onmessage = event => {
             if (Paint.INSTANCE instanceof Paint) {
                 postMessage({
                     type: "init",
-                    width: paint.width,
-                    height: paint.height,
+                    width: Paint.INSTANCE.width,
+                    height: Paint.INSTANCE.height,
                     successful: true
                 });
             } else {
