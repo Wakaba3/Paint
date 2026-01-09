@@ -598,6 +598,7 @@ onmessage = event => {
         case "init":
             Paint.INSTANCE = new Paint(event.data.view, event.data.width, event.data.height);
             Paint.INSTANCE.run();
+            requestAnimationFrame(() => Paint.INSTANCE.repaint());
 
             if (!(Paint.INSTANCE instanceof Paint)) {
                 postMessage({
@@ -605,8 +606,6 @@ onmessage = event => {
                     error: "ペイントを初期化できませんでした！"
                 });
             }
-
-            requestAnimationFrame(() => Paint.INSTANCE.repiant());
 
             return;
         case "resize":
