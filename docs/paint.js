@@ -308,15 +308,13 @@ class Paint {
             for (let i = 1; i < columns; ++i) {
                 if ((i & 7) === 0) {
                     context.stroke();
-                    context.strokeStyle = "rgba(192 192, 192, 1)";
+                    context.strokeStyle = "rgba(192, 192, 192, 1)";
                     context.beginPath();
 
                     context.moveTo(i * Paint.#MAX_SCALE, 0);
                     context.lineTo(i * Paint.#MAX_SCALE, height - 1);
 
                     context.stroke();
-
-                    console.log(i + ": " + context.strokeStyle);
 
                     context.strokeStyle = "rgba(255, 255, 255, 0.25)";
                     context.beginPath();
