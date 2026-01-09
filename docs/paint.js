@@ -376,12 +376,6 @@ class Paint {
         this.addFunction("cross-setup", () => {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
-
-        //Run
-        setTimeout(() => {
-            this.repaint();
-            this.run();
-        }, 1);
     }
 
     resize(width = 0, height = 0) {
@@ -601,6 +595,7 @@ onmessage = event => {
     switch (event.data.type) {
         case "init":
             Paint.INSTANCE = new Paint(event.data.view, event.data.width, event.data.height);
+            Paint.INSTANCE.run();
 
             if (!(Paint.INSTANCE instanceof Paint)) {
                 postMessage({
