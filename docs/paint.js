@@ -372,7 +372,7 @@ class Paint {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
 
-        paint.run();
+        this.run();
     }
 
     resize(width = 0, height = 0) {
