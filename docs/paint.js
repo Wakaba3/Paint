@@ -6,7 +6,7 @@ class Layer {
     }
 
     copy() {
-        return new Layer(this.name, this.blendMode, this.imageData);
+        return new Layer(this.name, this.blendMode, new ImageData(Uint8ClampedArray.from(this.imageData.data), this.imageData.width, this.imageData.height));
     }
 }
 
@@ -107,12 +107,7 @@ class Canvas {
     save() {
         this.#bindingRecord = this.#bindingRecord ? this.#bindingRecord + 1 : this.#records.length;
 
-        postMessage({
-            type: "message",
-            message: `レコード：${this.#bindingRecord}`
-        });
-
-        this.#records.splice(this.#bindingRecord, 0, this.encode());
+        this.#records.splice(this.#bindingRecord, Infinity, this.encode());
         
         if (this.#records.length > 256) {
             this.#records.shift();
