@@ -610,11 +610,8 @@ class Paint {
         };
     }
 
-    setPreferences(preferences) {
-        this.#preferences = this.#preferences ? this.#preferences : this.#createPreferences();
-
-        this.#preferences.backgroundColor = preferences.backgroundColor ?? this.#preferences.backgroundColor;
-        this.#preferences.displayGrid = preferences.displayGrid ?? this.#preferences.displayGrid;
+    setPreferences(preferences = this.#createPreferences()) {
+        this.#preferences = Object.assign(this.#preferences ?? {}, preferences);
 
         this.repaint();
     }
