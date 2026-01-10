@@ -158,7 +158,6 @@ class Canvas {
     composite() {
         const context = this.context;
         const buffer = this.#buffer.context;
-        const image = this.#buffer.canvas;
         const width = this.width;
         const height = this.height;
 
@@ -169,12 +168,12 @@ class Canvas {
             buffer.putImageData(layer.imageData, 0, 0);
 
             context.globalCompositeOperation = layer.blendMode;
-            context.drawImage(image, 0, 0);
+            context.drawImage(this.#buffer.canvas, 0, 0);
 
             buffer.clearRect(0, 0, width, height);
         });
 
-        return this.#canvas.canvas.transferToImageBitmap();
+        return this.#canvas.canvas.convertToBlob();
     }
 
     addLayer(name = "", blendMode = "source-over") {
@@ -225,13 +224,6 @@ class Canvas {
         });
     }
 
-    get info() {
-        return {
-            canUndo: this.#bindingRecord > 0,
-            canRedo: this.#bindingRecord < this.#records.length - 1
-        };
-    }
-
     get context() {
         return this.#canvas.context;
     }
@@ -242,6 +234,13 @@ class Canvas {
 
     get height() {
         return this.#canvas.height;
+    }
+
+    get info() {
+        return {
+            canUndo: this.#bindingRecord > 0,
+            canRedo: this.#bindingRecord < this.#records.length - 1
+        };
     }
 }
 
@@ -608,7 +607,7 @@ onmessage = event => {
                 });
             }
 
-            return;
+            break;
         case "resize":
             const successful = Paint.INSTANCE.resize(event.data.width, event.data.height)
 
@@ -619,38 +618,50 @@ onmessage = event => {
                 successful: successful
             });
 
-            return;
+            break;
+        case "import":
+            const canvas = Paint.INSTANCE.canvas;
+
+            event.data.images.forEach(image => {
+                canvas.addLayer(image.name);
+                canvas.context.drawImage(image);
+                canvas.apply();
+            });
+
+            canvas.save();
+
+            break;
         case "translate":
             Paint.INSTANCE.translateObject(event.data.index, event.data.dx, event.data.dy);
 
-            return;
+            break;
         case "scale":
             Paint.INSTANCE.scaleObject(event.data.index, event.data.dScale);
 
-            return;
+            break;
         case "rotate":
             Paint.INSTANCE.rotateObject(event.data.index, event.data.dAngle);
 
-            return;
+            break;
         case "set":
             Paint.INSTANCE.setObject(event.data.index, event.data.x, event.data.y, event.data.width, event.data.height, event.data.scale, event.data.angle);
 
-            return;
+            break;
         case "undo":
             Paint.INSTANCE.canvas.undo();
             Paint.INSTANCE.repaint();
 
-            return;
+            break;
         case "redo":
             Paint.INSTANCE.canvas.redo();
             Paint.INSTANCE.repaint();
 
-            return;
+            break;
         case "repaint":
             Paint.INSTANCE.repaint();
 
-            return;
+            break;
         default:
-            return;
+            break;
     }
 }

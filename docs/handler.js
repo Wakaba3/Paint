@@ -25,7 +25,7 @@ worker.onmessage = event => {
                 showMessage(`キャンバスのサイズを（幅、高さ）＝（${event.data.width}px、${event.data.height}px）に変更しました！`);
             }
 
-            return;
+            break;
         case "repaint":
             undo.style.pointerEvents = event.data.canvas.canUndo ? "auto" : "none";
             undo.style.color = event.data.canvas.canUndo ? "" : "var(--foreground-color)";
@@ -36,15 +36,15 @@ worker.onmessage = event => {
             zoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
             zoomIn.style.color = event.data.canZoomIn ? "" : "var(--foreground-color)";
             
-            return;
+            break;
         case "message":
             showMessage(event.data.message);
 
-            return;
+            break;
         case "error":
             throw new Error(event.data.error);
 
-            return;
+            break;
     }
 };
 
@@ -135,9 +135,10 @@ function importImages(files = []) {
     if (files.length <= 0)
         return;
 
-    Promise.all(files.map(file => createImageBitmap(file))).then(images => {
-        images.forEach(image => {
-            image.close();
+    Promise.all(files).then(images => {
+        postMessage({
+            type: "import",
+            images: images
         });
 
         if (images.length > 0) {
