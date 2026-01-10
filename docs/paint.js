@@ -420,6 +420,7 @@ class Paint {
 
     repaint(attempts = 1) {
         this.#repaint = Math.max(this.#repaint, attempts);
+        this.#repaint = Number.isFinite(this.#repaint) ? this.#repaint : 1;
 
         this.#bindObject(10);
 
