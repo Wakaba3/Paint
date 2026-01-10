@@ -107,15 +107,10 @@ class Canvas {
     }
 
     save() {
-        this.#bindingRecord = this.#bindingRecord ? this.#bindingRecord + 1 : this.#records.length;
+        this.#bindingRecord = Number.isFinite(this.#bindingRecord) && this.#bindingRecord >= 0 ? this.#bindingRecord + 1 : 0;
         this.#bindingRecord = Math.max(0, this.#bindingRecord);
 
         this.#records.splice(this.#bindingRecord, Infinity, this.encode());
-
-        postMessage({
-            type: "message",
-            message: this.#bindingRecord
-        });
         
         if (this.#records.length > 3) {
             --this.#bindingRecord;
