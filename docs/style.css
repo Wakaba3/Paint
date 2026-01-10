@@ -45,6 +45,7 @@ html, body {
     max-height: 800px;
     aspect-ratio: 1 / 1;
     z-index: 0;
+    background-color: var(--background-color);
 }
 
 #control-bar {

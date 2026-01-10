@@ -89,8 +89,6 @@ addEventListener("pointerdown", event => {
 
 addEventListener("pointermove", event => {
     points.set(event.pointerId, event);
-
-    console.log(event);
 });
 
 addEventListener("pointerup", event => {
@@ -108,10 +106,11 @@ addEventListener("keydown", event => {
     // Activity
     if (event.ctrlKey && !event.shiftKey && keys.has("z"))
         undoCanvas();
-    if (event.ctrlKey && event.shiftKey && keys.has("z"))
+    if (event.ctrlKey && event.shiftKey && keys.has("z")) {
         redoCanvas();
 
-    console.log(`ctrl: ${event.ctrlKey}, shift: ${event.shiftKey}`);
+        console.log(`ctrl: ${event.ctrlKey}, shift: ${event.shiftKey}`);
+    }
 
     // Transform
     if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
