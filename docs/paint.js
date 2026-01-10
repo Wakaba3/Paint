@@ -419,7 +419,7 @@ class Paint {
     }
 
     repaint(attempts = 1) {
-        this.#repaint = attempts;
+        this.#repaint = Math.max(this.#repaint, attempts);
 
         this.#bindObject(10);
 
