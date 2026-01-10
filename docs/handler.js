@@ -135,7 +135,12 @@ function importImages(files = []) {
     if (files.length <= 0)
         return;
 
-    Promise.all(files.map(file => createImageBitmap(file))).then(images => {
+    Promise.all(files.map(file => {
+        return {
+            name: file.name,
+            image: createImageBitmap(file)
+        };
+    })).then(images => {
         postMessage({
             type: "import",
             images: images

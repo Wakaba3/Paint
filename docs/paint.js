@@ -622,10 +622,10 @@ onmessage = event => {
 
             event.data.images.forEach(image => {
                 canvas.bind(canvas.addLayer(image.name));
-                canvas.context.drawImage(image);
+                canvas.context.drawImage(image.image);
                 canvas.apply();
 
-                image.close();
+                image.image.close();
             });
 
             canvas.save();
