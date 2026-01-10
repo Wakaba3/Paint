@@ -122,14 +122,22 @@ class Canvas {
         if (this.#bindingRecord > 0) {
             --this.#bindingRecord;
             this.#load();
+
+            return true;
         }
+
+        return false;
     }
 
     redo() {
         if (this.#bindingRecord < this.#records.length - 1) {
             ++this.#bindingRecord;
             this.#load();
+
+            return true;
         }
+
+        return false;
     }
 
     resize(width = 0, height = 0) {
@@ -711,13 +719,25 @@ onmessage = event => {
 
             break;
         case "undo":
-            Paint.INSTANCE.canvas.undo();
-            Paint.INSTANCE.repaint();
+            if (Paint.INSTANCE.canvas.undo()) {
+                Paint.INSTANCE.repaint();
+
+                postMessage({
+                    type: "message",
+                    message: "操作を元に戻しました"
+                });
+            }
 
             break;
         case "redo":
-            Paint.INSTANCE.canvas.redo();
-            Paint.INSTANCE.repaint();
+            if (Paint.INSTANCE.canvas.redo()) {
+                Paint.INSTANCE.repaint();
+
+                postMessage({
+                    type: "message",
+                    message: "操作をやり直しました"
+                });
+            }
 
             break;
         case "preferences":
