@@ -629,7 +629,7 @@ onmessage = event => {
             const canvas = Paint.INSTANCE.canvas;
 
             event.data.objects.forEach(object => {
-                canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.image));
+                canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.image, 0, 0));
 
                 object.image.close();
             });
