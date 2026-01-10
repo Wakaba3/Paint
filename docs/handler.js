@@ -102,9 +102,9 @@ addEventListener("keydown", event => {
     let dx = 0, dy = 0, mScale = 1;
 
     // Activity
-    if (keys.has("z") && event.ctrlKey && !event.shiftKey)
+    if (event.ctrlKey && !event.shiftKey && keys.has("z"))
         undoCanvas();
-    if (keys.has("z") && event.ctrlKey && event.shiftKey)
+    if (event.ctrlKey && event.shiftKey && keys.has("z"))
         redoCanvas();
 
 
