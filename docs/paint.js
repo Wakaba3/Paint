@@ -629,6 +629,7 @@ onmessage = event => {
             });
 
             canvas.save();
+            Paint.INSTANCE.repaint();
 
             break;
         case "translate":
