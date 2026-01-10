@@ -135,12 +135,12 @@ class Canvas {
 
     apply() {
         if (this.#bindingLayer) {
-            this.#bindingLayer.imageData = this.context.getImageData(0, 0, this.width, this.height);
+            this.#bindingLayer.imageData = this.#canvas.context.getImageData(0, 0, this.width, this.height);
         }
     }
 
     bind(index = -1) {
-        this.context.clearRect(0, 0, this.width, this.height);
+        this.#canvas.context.clearRect(0, 0, this.width, this.height);
 
         if (0 <= index && index < this.#layers.length) {
             this.#bindingIndex = index;
@@ -151,13 +151,13 @@ class Canvas {
         }
 
         if (this.#bindingLayer) {
-            this.context.putImageData(this.#bindingLayer.imageData, 0, 0);
+            this.#canvas.context.putImageData(this.#bindingLayer.imageData, 0, 0);
         }
     }
 
     output(target = null, x = 0, y = 0) {
         if (target instanceof OffscreenCanvasRenderingContext2D) {
-            const context = this.context;
+            const context = this.#canvas.context;
             const buffer = this.#buffer.context;
             const width = this.width;
             const height = this.height;
@@ -174,7 +174,7 @@ class Canvas {
                 buffer.clearRect(0, 0, width, height);
             });
 
-            target.drawImage(this.#canvas, x, y);
+            target.drawImage(this.#canvas.canvas, x, y);
         }
     }
 
@@ -186,7 +186,7 @@ class Canvas {
         if (index < 0 || index > this.#layers.length)
             return -1;
 
-        this.#layers.splice(index, 0, new Layer(name, blendMode, this.context.createImageData(this.width, this.height)));
+        this.#layers.splice(index, 0, new Layer(name, blendMode, this.#canvas.context.createImageData(this.width, this.height)));
         this.#shiftListIndexes(index, 1)
 
         return index;
@@ -224,10 +224,6 @@ class Canvas {
                 list.start += dir;
             }
         });
-    }
-
-    get context() {
-        return this.#canvas.context;
     }
 
     get width() {
