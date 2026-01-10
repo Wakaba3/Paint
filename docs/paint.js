@@ -192,15 +192,15 @@ class Canvas {
         }
     }
 
-    addLayer(name = "", blendMode = "source-over") {
+    addLayer(name = "", blendMode = "source-over", imageData = new ImageData(this.width, this.height)) {
         return this.addLayerAt(this.#bindingIndex + 1, name, blendMode);
     }
 
-    addLayerAt(index = -1, name = "", blendMode = "source-over") {
+    addLayerAt(index = -1, name = "", blendMode = "source-over", imageData = new ImageData(this.width, this.height)) {
         if (index < 0 || index > this.#layers.length)
             return -1;
 
-        this.#layers.splice(index, 0, new Layer(name, blendMode, new ImageData(this.width, this.height)));
+        this.#layers.splice(index, 0, new Layer(name, blendMode, imageData));
         this.#shiftListIndexes(index, 1)
 
         return index;
@@ -657,7 +657,7 @@ onmessage = event => {
 
                     canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.content, 0, 0));
                     object.content.close();
-                    
+
                 }
             });
 
