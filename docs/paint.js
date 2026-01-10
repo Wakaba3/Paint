@@ -105,10 +105,9 @@ class Canvas {
     }
 
     save() {
-        this.#bindingRecord = this.#bindingRecord ? ++this.#bindingRecord : this.#records.length;
+        this.#bindingRecord = this.#bindingRecord ? this.#bindingRecord + 1 : this.#records.length;
 
         this.#records.splice(this.#bindingRecord, 0, this.encode());
-        this.#records.length = this.#bindingRecord + 1;
         
         if (this.#records.length > 256) {
             this.#records.shift();
