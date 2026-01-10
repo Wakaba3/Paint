@@ -84,13 +84,17 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("pointerdown", event => {
-    console.log(event);
+    points.set(event.pointerId, event);
 })
 
 addEventListener("pointermove", event => {
+    points.set(event.pointerId, event);
+
+    console.log(points);
 });
 
 addEventListener("pointerup", event => {
+    points.delete(event.pointerId);
 });
 
 addEventListener("keydown", event => {
