@@ -447,8 +447,10 @@ class Paint {
             height: this.#bindingObject.height,
             scale: this.#bindingObject.scale,
             angle: this.#bindingObject.angle,
+
             backgroundColor: this.#preferences.backgroundColor,
             displayGrid: this.#preferences.displayGrid,
+
             canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE,
             canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE
         });
@@ -459,6 +461,15 @@ class Paint {
             this.#bindingIndex = index;
             this.#bindingObject = this.#getObject(index);
         }
+    }
+
+    centerObject(index = 0) {
+        this.#bindObject(index);
+
+        this.#bindingObject.x = this.#view.width / 2 - this.#bindingObject.width / 2;
+        this.#bindingObject.y = this.#view.height / 2 - this.#bindingObject.height / 2;
+
+        this.repaint();
     }
 
     locateObject(index = 0, x = 0, y = 0) {
@@ -677,6 +688,10 @@ onmessage = event => {
                 height: Paint.INSTANCE.height,
                 successful: successful
             });
+
+            break;
+        case "center":
+            Paint.INSTANCE.centerObject(event.data.index);
 
             break;
         case "translate":

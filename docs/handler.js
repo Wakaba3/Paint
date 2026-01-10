@@ -207,6 +207,13 @@ function redoCanvas() {
     worker.postMessage({ type: "redo" });
 }
 
+function centerCanvas() {
+    worker.postMessage({
+        type: "center",
+        index: 10
+    });
+}
+
 function translateCanvas(dx = 0, dy = 0) {
     worker.postMessage({
         type: "translate",

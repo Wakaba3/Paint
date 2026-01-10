@@ -107,10 +107,18 @@ html, body {
     gap: 5px;
 }
 
+#translate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
 #zoom-out,
 #zoom-in,
 #rotate-left,
-#rotate-right {
+#rotate-right,
+#center {
     pointer-events: auto;
     flex: 1;
     width: 30px;
@@ -223,6 +231,7 @@ html, body {
 #zoom-in:active,
 #rotate-left:active,
 #rotate-right:active,
+#center:active,
 #tool-bar > *:active,
 #display:active,
 #import:active,
