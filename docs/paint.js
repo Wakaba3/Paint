@@ -111,7 +111,8 @@ class Canvas {
 
         this.#records.splice(this.#bindingRecord, Infinity, this.encode());
         
-        if (this.#records.length > 256) {
+        if (this.#records.length > 3) {
+            this.#bindingRecord = 2;
             this.#records.shift();
         }
     }
