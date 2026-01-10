@@ -112,7 +112,7 @@ class Canvas {
 
         this.#records.splice(this.#bindingRecord, Infinity, this.encode());
         
-        if (this.#records.length > 3) {
+        if (this.#records.length > 256) {
             --this.#bindingRecord;
             this.#records.shift();
         }
@@ -649,8 +649,16 @@ onmessage = event => {
             const canvas = Paint.INSTANCE.canvas;
 
             event.data.objects.forEach(object => {
-                canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.image, 0, 0));
-                object.image.close();
+                if (object.content instanceof ImageData) {
+
+                    canvas.bind(canvas.addLayer(object.name, "source-over", object.content));
+
+                } else if (object.context instanceof ImageBitmap) {
+
+                    canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.content, 0, 0));
+                    object.content.close();
+                    
+                }
             });
 
             canvas.save();

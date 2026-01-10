@@ -1,6 +1,8 @@
 const worker = new Worker("paint.js");
 
 const view = document.getElementById("view").transferControlToOffscreen();
+const buffer = new OffscreenCanvas(0, 0);
+const context = buffer.getContext("2d", { willReadFrequently : true });
 
 const undo = document.getElementById("undo");
 const redo = document.getElementById("redo");
@@ -150,22 +152,32 @@ function importImages(files = []) {
     if (files.length <= 0)
         return;
 
-    Promise.all(files.map(file => createImageBitmap(file))).then(images => {
-        worker.postMessage({
-            type: "import",
-            objects: images.map((image, index) => {
-                return {
-                    name: files[index].name,
-                    image: image
-                };
-            })
-        });
+    Promise.all(files.map(file => createImageBitmap(file).then(image => {
+        buffer.width = image.width;
+        buffer.height = image.height;
 
-        if (images.length > 0) {
-            if (images.length === 1) {
+        context.clearRect(0, 0, buffer.width, buffer.height);
+        context.drawImage(image, 0, 0);
+
+        image.close();
+
+        return {
+            name: file.name, 
+            content: context.getImageData(0, 0, buffer.width, buffer.height)
+        };
+    }))).then(objects => {
+        if (objects.length > 0) {
+            worker.postMessage({
+                type: "import",
+                objects: objects
+            });
+        }
+
+        if (objects.length > 0) {
+            if (objects.length === 1) {
                 showMessage("画像を読み込みました");
             } else {
-                showMessage(`${images.length}枚の画像を読み込みました`);
+                showMessage(`${objects.length}枚の画像を読み込みました`);
             }
         }
     }).catch(error => {
