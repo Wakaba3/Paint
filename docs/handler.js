@@ -165,6 +165,11 @@ function importImages(files = []) {
             name: file.name, 
             content: context.getImageData(0, 0, buffer.width, buffer.height)
         };
+    }).catch(error => {
+        return {
+            name: "",
+            content: null
+        };
     }))).then(objects => {
         if (objects.length > 0) {
             worker.postMessage({
