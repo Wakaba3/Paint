@@ -155,6 +155,14 @@ class Canvas {
         }
     }
 
+    draw(index = -1, renderer = () => {}) {
+        this.bind(index);
+
+        renderer(this.#canvas.context);
+
+        this.apply();
+    }
+
     output(target = null, x = 0, y = 0) {
         if (target instanceof OffscreenCanvasRenderingContext2D) {
             const context = this.#canvas.context;
@@ -621,9 +629,7 @@ onmessage = event => {
             const canvas = Paint.INSTANCE.canvas;
 
             event.data.objects.forEach(object => {
-                canvas.bind(canvas.addLayer(object.name));
-                canvas.context.drawImage(object.image);
-                canvas.apply();
+                canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.image));
 
                 object.image.close();
             });
