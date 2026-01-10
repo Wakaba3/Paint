@@ -107,6 +107,11 @@ class Canvas {
     save() {
         this.#bindingRecord = this.#bindingRecord ? this.#bindingRecord + 1 : this.#records.length;
 
+        postMessage({
+            type: "message",
+            message: `レコード：${this.#bindingRecord}`
+        });
+
         this.#records.splice(this.#bindingRecord, 0, this.encode());
         
         if (this.#records.length > 256) {
@@ -147,19 +152,22 @@ class Canvas {
         } else {
             this.#bindingIndex = -1;
             this.#bindingLayer = null;
+
+            return false;
         }
 
         if (this.#bindingLayer) {
             this.#canvas.context.putImageData(this.#bindingLayer.imageData, 0, 0);
         }
+
+        return true;
     }
 
     draw(index = -1, renderer = () => {}) {
-        this.bind(index);
-
-        renderer(this.#canvas.context);
-
-        this.apply();
+        if (this.bind(index)) {
+            renderer(this.#canvas.context);
+            this.apply();
+        }
     }
 
     output(target = null, x = 0, y = 0) {
@@ -629,7 +637,6 @@ onmessage = event => {
 
             event.data.objects.forEach(object => {
                 canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.image, 0, 0));
-
                 object.image.close();
             });
 
