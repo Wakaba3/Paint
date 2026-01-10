@@ -376,8 +376,6 @@ class Paint {
         this.addFunction("cross-setup", () => {
             this.locateObject(30, this.#view.width / 2, this.#view.height / 2);
         });
-
-        this.repaint();
     }
 
     resize(width = 0, height = 0) {
@@ -393,9 +391,11 @@ class Paint {
     run() {
         this.stop();
 
+        setTimeout(() => this.repaint(), 1000 / 30);
+
         this.#renderer = setInterval(() => {
             if (this.#repaint) {
-                requestAnimationFrame(this.#render);
+                this.#render();
 
                 this.#repaint = false;
             }
