@@ -398,11 +398,6 @@ class Paint {
             if (this.#repaint > 0) {
                 this.#render();
 
-                postMessage({
-                    type: "message",
-                    message: "描画済み"
-                });
-
                 --this.#repaint;
             }
         }, 1000 / 30);
