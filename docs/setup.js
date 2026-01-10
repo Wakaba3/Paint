@@ -75,6 +75,10 @@ function setup() {
                 0.5s linear 2.5s 1 normal forwards running message-fade-out;
         }
 
+        .message:active {
+            background-color: var(--foreground-color);
+        }
+
         @keyframes message-fade-in {
             from {
                 transform: translate(-50%, -25%);
@@ -181,16 +185,12 @@ function setup() {
     addEventListener("pointerdown", event => {
         const target = event.target;
 
-        if (target instanceof HTMLElement) {
-            if (target.classList.contains("message")) {
-                target.remove();
-            } else if (target.classList.contains("panel") && target.hasAttribute("draggable")) {
-                const param = params.get(target);
+        if (target instanceof HTMLElement && target.classList.contains("panel") && target.hasAttribute("draggable")) {
+            const param = params.get(target);
 
-                param.dragging = true;
-                param.offsetX = target.offsetLeft - event.pageX;
-                param.offsetY = target.offsetTop - event.pageY;
-            }
+            param.dragging = true;
+            param.offsetX = target.offsetLeft - event.pageX;
+            param.offsetY = target.offsetTop - event.pageY;
         }
     });
 
@@ -207,7 +207,13 @@ function setup() {
     });
 
     addEventListener("pointerup", event => {
+        const target = event.target;
+
         params.forEach(params => params.dragging = false);
+
+        if (target instanceof HTMLElement && target.classList.contains("message")) {
+            target.remove();
+        }
     });
 
     window.addEventListener("resize", event => {
