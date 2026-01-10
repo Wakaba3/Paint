@@ -156,7 +156,7 @@ class Canvas {
     }
 
     output(target = null, x = 0, y = 0) {
-        if (target instanceof CanvasRenderingContext2D || target instanceof OffscreenCanvasRenderingContext2D) {
+        if (target instanceof OffscreenCanvasRenderingContext2D) {
             const context = this.context;
             const buffer = this.#buffer.context;
             const width = this.width;
