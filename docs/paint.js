@@ -193,7 +193,7 @@ class Canvas {
     }
 
     addLayer(name = "", blendMode = "source-over", imageData = new ImageData(this.width, this.height)) {
-        return this.addLayerAt(this.#bindingIndex + 1, name, blendMode);
+        return this.addLayerAt(this.#bindingIndex + 1, name, blendMode, imageData);
     }
 
     addLayerAt(index = -1, name = "", blendMode = "source-over", imageData = new ImageData(this.width, this.height)) {
