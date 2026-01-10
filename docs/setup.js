@@ -181,12 +181,16 @@ function setup() {
     addEventListener("pointerdown", event => {
         const target = event.target;
 
-        if (target instanceof HTMLElement && target.classList.contains("panel") && target.hasAttribute("draggable")) {
-            const param = params.get(target);
+        if (target instanceof HTMLElement) {
+            if (target.classList.contains("message")) {
+                target.remove();
+            } else if (target.classList.contains("panel") && target.hasAttribute("draggable")) {
+                const param = params.get(target);
 
-            param.dragging = true;
-            param.offsetX = target.offsetLeft - event.pageX;
-            param.offsetY = target.offsetTop - event.pageY;
+                param.dragging = true;
+                param.offsetX = target.offsetLeft - event.pageX;
+                param.offsetY = target.offsetTop - event.pageY;
+            }
         }
     });
 
