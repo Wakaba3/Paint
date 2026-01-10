@@ -111,6 +111,11 @@ class Canvas {
         this.#bindingRecord = Math.max(0, this.#bindingRecord);
 
         this.#records.splice(this.#bindingRecord, Infinity, this.encode());
+
+        postMessage({
+            type: "message",
+            message: this.#bindingRecord
+        });
         
         if (this.#records.length > 3) {
             --this.#bindingRecord;
