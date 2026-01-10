@@ -109,10 +109,13 @@ addEventListener("keydown", event => {
         dx += 1;
     if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
         dy -= 1;
-    if (keys.has("+"))
-        mScale *= Math.SQRT2;
-    if (keys.has("-"))
-        mScale /= Math.SQRT2;
+    if (keys.has("z")) {
+        if (event.shiftKey) {
+            mScale *= Math.SQRT2;
+        } else {
+            mScale /= Math.SQRT2;
+        }
+    }
 
     if (dx !== 0 || dy !== 0) {
         const length = Math.sqrt(dx * dx + dy * dy);
