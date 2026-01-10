@@ -1,29 +1,23 @@
-class Cloneable {
-    clone() {
-        return new Cloneable();
-    }
-}
-
-class Layer extends Cloneable {
+class Layer {
     constructor(name = "", blendMode = "source-over", imageData = null) {
         this.name = name;
         this.blendMode = blendMode;
         this.imageData = imageData;
     }
 
-    clone() {
+    copy() {
         return new Layer(this.name, this.blendMode, this.imageData);
     }
 }
 
-class LayerList extends Cloneable {
+class LayerList {
     constructor(name = "", start = -1, length = 0) {
         this.name = name;
         this.start = start;
         this.length = length;
     }
 
-    clone() {
+    copy() {
         return new LayerList(this.name, this.start, this.length);
     }
 }
@@ -100,8 +94,8 @@ class Canvas {
         return {
             width: this.width,
             height: this.height,
-            layers: this.#layers.map(layer => layer.clone()),
-            lists: this.#lists.map(list => list.clone())
+            layers: this.#layers.map(layer => layer.copy()),
+            lists: this.#lists.map(list => list.copy())
         };
     }
 
