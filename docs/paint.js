@@ -84,10 +84,10 @@ class Canvas {
         this.resize(object.width, object.height);
         
         if (object.layers instanceof Array)
-            this.#layers = object.layers;
+            this.#layers = object.layers.map(layer => layer.copy());
 
         if (object.lists instanceof Array)
-            this.#lists = object.lists;
+            this.#lists = object.lists.map(list => list.copy());
 
         this.bind(object.binding);
     }
@@ -104,11 +104,6 @@ class Canvas {
 
     #load() {
         this.decode(this.#records[this.#bindingRecord]);
-
-        postMessage({
-            type: "message",
-            message: this.#layers.join(", ")
-        });
     }
 
     save() {
