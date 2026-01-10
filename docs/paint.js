@@ -174,7 +174,14 @@ class Canvas {
                 buffer.clearRect(0, 0, width, height);
             });
 
-            target.drawImage(this.#canvas.canvas, x, y);
+            postMessage({
+                type: "message",
+                message: this.#canvas.canvas instanceof OffscreenCanvas
+            });
+
+            if (this.#canvas.canvas instanceof OffscreenCanvas) {
+                target.drawImage(this.#canvas.canvas, x, y);
+            }
         }
     }
 
