@@ -620,12 +620,12 @@ onmessage = event => {
         case "import":
             const canvas = Paint.INSTANCE.canvas;
 
-            event.data.images.forEach(image => {
-                canvas.bind(canvas.addLayer(image.name));
-                canvas.context.drawImage(image.image);
+            event.data.objects.forEach(object => {
+                canvas.bind(canvas.addLayer(object.name));
+                canvas.context.drawImage(object.image);
                 canvas.apply();
 
-                image.image.close();
+                object.image.close();
             });
 
             canvas.save();

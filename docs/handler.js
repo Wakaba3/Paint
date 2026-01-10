@@ -140,17 +140,17 @@ function importImages(files = []) {
             name: file.name,
             image: createImageBitmap(file)
         };
-    })).then(images => {
-        postMessage({
+    })).then(objects => {
+        worker.postMessage({
             type: "import",
-            images: images
+            objects: objects
         });
 
-        if (images.length > 0) {
-            if (images.length === 1) {
+        if (objects.length > 0) {
+            if (objects.length === 1) {
                 showMessage("画像を読み込みました");
             } else {
-                showMessage(`${images.length}枚の画像を読み込みました`);
+                showMessage(`${objects.length}枚の画像を読み込みました`);
             }
         }
     }).catch(error => {
