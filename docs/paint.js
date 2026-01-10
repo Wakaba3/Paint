@@ -446,9 +446,9 @@ class Paint {
             scale: this.#bindingObject.scale,
             angle: this.#bindingObject.angle,
             backgroundColor: this.#preferences.backgroundColor,
+            displayGrid: this.#preferences.displayGrid,
             canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE,
-            canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE,
-            displayGrid: this.#preferences.displayGrid
+            canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE
         });
     }
 
