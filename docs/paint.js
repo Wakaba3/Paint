@@ -390,11 +390,16 @@ class Paint {
 
     run() {
         this.stop();
-        this.repaint(2);
+        this.repaint(10);
 
         this.#renderer = setInterval(() => {
             if (this.#repaint > 0) {
                 this.#render();
+
+                postMessage({
+                    type: "message",
+                    message: "描画済み"
+                });
 
                 --this.#repaint;
             }
