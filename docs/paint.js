@@ -108,6 +108,7 @@ class Canvas {
 
     save() {
         this.#bindingRecord = this.#bindingRecord ? this.#bindingRecord + 1 : this.#records.length;
+        this.#bindingRecord = Math.max(0, this.#bindingRecord);
 
         this.#records.splice(this.#bindingRecord, Infinity, this.encode());
         
@@ -115,6 +116,11 @@ class Canvas {
             --this.#bindingRecord;
             this.#records.shift();
         }
+
+        postMessage({
+            type: "message",
+            message: this.#records.join("")
+        });
     }
 
     undo() {
