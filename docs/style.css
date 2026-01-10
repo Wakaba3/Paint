@@ -149,6 +149,7 @@ html, body {
     border-radius: 10px;
 }
 
+#display,
 #import,
 #export,
 #size {
@@ -156,6 +157,19 @@ html, body {
     padding: 5px 30px;
     text-align: center;
     border-radius: 5px;
+}
+
+#display-grid-contents {
+    display: flex;
+    align-items: center;
+}
+
+#display-grid-contents > * {
+    flex: 1;
+}
+
+#display-grid {
+    pointer-events: auto;
 }
 
 #import-chooser {
@@ -210,6 +224,7 @@ html, body {
 #rotate-left:active,
 #rotate-right:active,
 #tool-bar > *:active,
+#display:active,
 #import:active,
 #export:active,
 #size:active,

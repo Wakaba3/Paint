@@ -7,6 +7,8 @@ const redo = document.getElementById("redo");
 const zoomOut = document.getElementById("zoom-out");
 const zoomIn = document.getElementById("zoom-in");
 
+const displayGrid = document.getElementById("display-grid");
+
 const importChooser = document.getElementById("import-chooser");
 
 const sizeWidth = document.getElementById("size-width");
@@ -72,6 +74,10 @@ addEventListener("panelopen", event => {
 
 addEventListener("panelclose", event => {
     switch (event.detail.id) {
+        case "display-panel":
+            setPreferences({ displayGrid: displayGrid.checked });
+
+            break;
         case "import-panel":
             importImages(Array.from(importChooser.files));
 
@@ -209,5 +215,12 @@ function rotateCanvas(dAngle = 0) {
         type: "rotate",
         index: 10,
         dAngle: dAngle
+    });
+}
+
+function setPreferences(preferences = {}) {
+    worker.postMessage({
+        type: "preferences",
+        preferences: preferences
     });
 }

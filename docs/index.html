@@ -47,13 +47,22 @@
     </div>
 
     <div id="preference-panel" class="panel" draggable>
+        <div id="display" onclick="togglePanel('display-panel', true)">表示の設定</div>
         <div id="import" onclick="togglePanel('import-panel', true)">画像の読み込み</div>
         <div id="export" onclick="togglePanel('export-panel', true)">画像の保存</div>
-        <div id="size" onclick="togglePanel('size-panel', true)">画像のサイズの変更</div>
+        <div id="size" onclick="togglePanel('size-panel', true)">キャンバスのサイズの変更</div>
+    </div>
+
+    <div id="display-panel" class="panel" draggable>
+        <div id="display-grid-contents">
+            <label for="display-grid">グリッド：</label>
+            <input id="display-grid" type="checkbox" checked />
+        </div>
+        <div class="panel-close">OK</div>
     </div>
 
     <div id="import-panel" class="panel" draggable>
-        <div><input id="import-chooser" type="file" accept="image/*" multiple /></div>
+        <input id="import-chooser" type="file" accept="image/*" multiple />
         <div class="panel-close">OK</div>
     </div>
 
@@ -63,7 +72,7 @@
 
     <div id="size-panel" class="panel" draggable>
         <div id="size-contents">
-            <label>画像のサイズ：</label>
+            <div>画像のサイズ：</div>
             <div id="size-inputs">
                 <div id="size-width-contents">
                     <label for="size-width">幅：</label>

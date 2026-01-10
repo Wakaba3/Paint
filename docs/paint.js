@@ -264,6 +264,7 @@ class Paint {
     #view;
     #context;
     #canvas;
+    #preferences;
 
     #objects;
     #functions;
@@ -290,14 +291,16 @@ class Paint {
 
         this.#repaint = 0;
 
+        this.setPreferences();
+
         // Background renderer
-        this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle) => {
+        this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle, preferences) => {
             context.fillStyle = "rgba(0, 0, 0, 0)";
             context.fillRect(0, 0, width, height);
         });
 
         // Canvas renderer
-        this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
+        this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle, preferences) => {
             context.translate(this.#view.width / 2, this.#view.height / 2);
             context.scale(scale, scale);
             context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
@@ -308,7 +311,10 @@ class Paint {
         });
 
         // Grid renderer
-        this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
+        this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle, preferences) => {
+            if (!preferences.displayGrid)
+                return;
+
             width *= scale;
             height *= scale;
 
@@ -439,8 +445,10 @@ class Paint {
             height: this.#bindingObject.height,
             scale: this.#bindingObject.scale,
             angle: this.#bindingObject.angle,
+            backgroundColor: this.#preferences.backgroundColor,
             canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE,
             canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE,
+            displayGrid: this.#preferences.displayGrid
         });
     }
 
@@ -569,6 +577,10 @@ class Paint {
         this.#functions.delete(name);
     }
 
+    #getBuffer(name = "") {
+        return this.#buffers.get(name);
+    }
+
     #registerBuffer(name = "", image = null) {
         if (image) {
             this.#closeBuffer(name);
@@ -589,6 +601,24 @@ class Paint {
 
             this.#buffers.delete(name);
         }
+    }
+
+    #createPreferences() {
+        return {
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            displayGrid: true
+        };
+    }
+
+    setPreferences(preferences) {
+        this.#preferences = this.#preferences ? this.#preferences : this.#createPreferences;
+
+        this.#preferences.backgroundColor = preferences.backgroundColor ?? this.#preferences.backgroundColor;
+        this.#preferences.displayGrid = preferences.displayGrid ?? this.#preferences.displayGrid;
+
+        this.#registerBuffer("preferneces", Object.assign({}, this.#preferences));
+
+        this.repaint();
     }
 
     get canvas() {
@@ -618,17 +648,6 @@ onmessage = event => {
             }
 
             break;
-        case "resize":
-            const successful = Paint.INSTANCE.resize(event.data.width, event.data.height)
-
-            postMessage({
-                type: "resize",
-                width: Paint.INSTANCE.width,
-                height: Paint.INSTANCE.height,
-                successful: successful
-            });
-
-            break;
         case "import":
             const canvas = Paint.INSTANCE.canvas;
 
@@ -639,6 +658,19 @@ onmessage = event => {
 
             canvas.save();
             Paint.INSTANCE.repaint();
+
+            break;
+        case "resize":
+            const successful = Paint.INSTANCE.resize(event.data.width, event.data.height);
+
+            Paint.INSTANCE.canvas.save();
+
+            postMessage({
+                type: "resize",
+                width: Paint.INSTANCE.width,
+                height: Paint.INSTANCE.height,
+                successful: successful
+            });
 
             break;
         case "translate":
@@ -665,6 +697,10 @@ onmessage = event => {
         case "redo":
             Paint.INSTANCE.canvas.redo();
             Paint.INSTANCE.repaint();
+
+            break;
+        case "preferences":
+            Paint.INSTANCE.setPreferences(event.data.preferences);
 
             break;
         case "repaint":
