@@ -390,8 +390,7 @@ class Paint {
 
     run() {
         this.stop();
-
-        setTimeout(() => this.repaint(), 1000 / 30);
+        this.repaint();
 
         this.#renderer = setInterval(() => {
             if (this.#repaint) {
