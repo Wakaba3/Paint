@@ -155,6 +155,7 @@ function importImages(files = []) {
         }
     }).catch(error => {
         showMessage("画像の読み込みに失敗しました！");
+        console.log(error);
     });
 }
 
