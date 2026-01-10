@@ -155,25 +155,27 @@ class Canvas {
         }
     }
 
-    composite() {
-        const context = this.context;
-        const buffer = this.#buffer.context;
-        const width = this.width;
-        const height = this.height;
+    output(target = null, x = 0, y = 0) {
+        if (target instanceof CanvasRenderingContext2D || target instanceof OffscreenCanvasRenderingContext2D) {
+            const context = this.context;
+            const buffer = this.#buffer.context;
+            const width = this.width;
+            const height = this.height;
 
-        context.clearRect(0, 0, width, height);
-        buffer.clearRect(0, 0, width, height);
-
-        this.#layers.forEach(layer => {
-            buffer.putImageData(layer.imageData, 0, 0);
-
-            context.globalCompositeOperation = layer.blendMode;
-            context.drawImage(this.#buffer.canvas, 0, 0);
-
+            context.clearRect(0, 0, width, height);
             buffer.clearRect(0, 0, width, height);
-        });
 
-        return this.#canvas.canvas.convertToBlob();
+            this.#layers.forEach(layer => {
+                buffer.putImageData(layer.imageData, 0, 0);
+
+                context.globalCompositeOperation = layer.blendMode;
+                context.drawImage(this.#buffer.canvas, 0, 0);
+
+                buffer.clearRect(0, 0, width, height);
+            });
+
+            target.drawImage(this.#canvas, x, y);
+        }
     }
 
     addLayer(name = "", blendMode = "source-over") {
@@ -293,7 +295,7 @@ class Paint {
             context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
-            context.drawImage(this.#registerBuffer("canvas", this.#canvas.composite()), 0, 0);
+            this.#canvas.output(context);
             context.resetTransform();
         });
 
