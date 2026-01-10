@@ -390,7 +390,7 @@ class Paint {
 
     run() {
         this.stop();
-        this.repaint(10);
+        this.repaint(2);
 
         this.#renderer = setInterval(() => {
             if (this.#repaint > 0) {
