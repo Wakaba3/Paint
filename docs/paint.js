@@ -112,7 +112,7 @@ class Canvas {
         this.#records.splice(this.#bindingRecord, Infinity, this.encode());
         
         if (this.#records.length > 3) {
-            this.#bindingRecord = Math.min(this.#bindingRecord - 1, 2);
+            --this.#bindingRecord;
             this.#records.shift();
         }
     }
