@@ -621,7 +621,7 @@ onmessage = event => {
             const canvas = Paint.INSTANCE.canvas;
 
             event.data.images.forEach(image => {
-                canvas.addLayer(image.name);
+                canvas.bind(canvas.addLayer(image.name));
                 canvas.context.drawImage(image);
                 canvas.apply();
 
