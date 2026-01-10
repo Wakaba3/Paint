@@ -279,6 +279,8 @@ class Paint {
 
         this.#buffers = new Map();
 
+        this.#repaint = 0;
+
         // Background renderer
         this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle) => {
             context.fillStyle = "rgba(0, 0, 0, 0)";
