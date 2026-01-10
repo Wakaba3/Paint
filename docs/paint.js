@@ -624,6 +624,8 @@ onmessage = event => {
                 canvas.addLayer(image.name);
                 canvas.context.drawImage(image);
                 canvas.apply();
+
+                image.close();
             });
 
             canvas.save();
