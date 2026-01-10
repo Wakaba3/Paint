@@ -390,18 +390,13 @@ class Paint {
 
     run() {
         this.stop();
-        this.repaint();
+        this.repaint(2);
 
         this.#renderer = setInterval(() => {
-            if (this.#repaint) {
+            if (this.#repaint > 0) {
                 this.#render();
 
-                postMessage({
-                    type: "message",
-                    message: "描画済み"
-                });
-
-                this.#repaint = false;
+                --this.#repaint;
             }
         }, 1000 / 30);
     }
@@ -418,8 +413,8 @@ class Paint {
         this.#objects.forEach(object => object.renderer(this.#context, object.x, object.y, object.width, object.height, object.scale, object.angle));
     }
 
-    repaint() {
-        this.#repaint = true;
+    repaint(attempts = 1) {
+        this.#repaint = attempts;
 
         this.#bindObject(10);
 
