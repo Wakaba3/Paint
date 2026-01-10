@@ -1,23 +1,29 @@
-class Layer {
+class Cloneable {
+    clone() {
+        return new Cloneable();
+    }
+}
+
+class Layer extends Cloneable {
     constructor(name = "", blendMode = "source-over", imageData = null) {
         this.name = name;
         this.blendMode = blendMode;
         this.imageData = imageData;
     }
 
-    copy() {
-        return new Layer(this.name, this.blendMode, new ImageData(Uint8ClampedArray.from(this.imageData.data), this.imageData.width, this.imageData.height));
+    clone() {
+        return new Layer(this.name, this.blendMode, this.imageData);
     }
 }
 
-class LayerList {
+class LayerList extends Cloneable {
     constructor(name = "", start = -1, length = 0) {
         this.name = name;
         this.start = start;
         this.length = length;
     }
 
-    copy() {
+    clone() {
         return new LayerList(this.name, this.start, this.length);
     }
 }
@@ -94,8 +100,8 @@ class Canvas {
         return {
             width: this.width,
             height: this.height,
-            layers: this.#layers.map(layer => layer.copy()),
-            lists: this.#lists.map(list => list.copy())
+            layers: this.#layers.map(layer => layer.clone()),
+            lists: this.#lists.map(list => list.clone())
         };
     }
 
@@ -196,7 +202,7 @@ class Canvas {
         if (index < 0 || index > this.#layers.length)
             return -1;
 
-        this.#layers.splice(index, 0, new Layer(name, blendMode, this.#canvas.context.createImageData(this.width, this.height)));
+        this.#layers.splice(index, 0, new Layer(name, blendMode, new ImageData(this.width, this.height)));
         this.#shiftListIndexes(index, 1)
 
         return index;
