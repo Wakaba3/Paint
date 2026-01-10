@@ -395,7 +395,7 @@ class Paint {
 
         this.#renderer = setInterval(() => {
             if (this.#repaint) {
-                this.#render();
+                requestAnimationFrame(this.#render);
 
                 this.#repaint = false;
             }
@@ -598,7 +598,6 @@ onmessage = event => {
         case "init":
             Paint.INSTANCE = new Paint(event.data.view, event.data.width, event.data.height);
             Paint.INSTANCE.run();
-            requestAnimationFrame(() => Paint.INSTANCE.repaint());
 
             if (!(Paint.INSTANCE instanceof Paint)) {
                 postMessage({
