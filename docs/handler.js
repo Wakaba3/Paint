@@ -101,6 +101,16 @@ addEventListener("keydown", event => {
 
     let dx = 0, dy = 0, mScale = 1;
 
+    // Activity
+    if (keys.has("z") && event.shiftKey) {
+        if (event.ctrlKey) {
+            redoCanvas();
+        } else {
+            undoCanvas();
+        }
+    }
+
+    // Transform
     if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
         dx -= 1;
     if (keys.has("w") || keys.has("W") || keys.has("ArrowUp"))
@@ -109,13 +119,10 @@ addEventListener("keydown", event => {
         dx += 1;
     if (keys.has("s") || keys.has("S") || keys.has("ArrowDown"))
         dy -= 1;
-    if (keys.has("z")) {
-        if (event.shiftKey) {
-            mScale *= Math.SQRT2;
-        } else {
-            mScale /= Math.SQRT2;
-        }
-    }
+    if (keys.has(";") || keys.has("+"))
+        mScale *= Math.SQRT2;
+    if (keys.has("-"))
+        mScale /= Math.SQRT2;
 
     if (dx !== 0 || dy !== 0) {
         const length = Math.sqrt(dx * dx + dy * dy);
@@ -168,6 +175,14 @@ function resizeCanvas(width = 0, height = 0) {
         width: width,
         height: height
     });
+}
+
+function undoCanvas() {
+    worker.postMessage({ type: "undo" });
+}
+
+function redoCanvas() {
+    worker.postMessage({ type: "redo" });
 }
 
 function translateCanvas(dx = 0, dy = 0) {
