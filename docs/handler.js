@@ -90,7 +90,7 @@ addEventListener("pointerdown", event => {
 addEventListener("pointermove", event => {
     points.set(event.pointerId, event);
 
-    console.log(points);
+    console.log(event);
 });
 
 addEventListener("pointerup", event => {
@@ -111,6 +111,7 @@ addEventListener("keydown", event => {
     if (event.ctrlKey && event.shiftKey && keys.has("z"))
         redoCanvas();
 
+    console.log(`ctrl: ${event.ctrlKey}, shift: ${event.shiftKey}`);
 
     // Transform
     if (keys.has("d") || keys.has("D") || keys.has("ArrowRight"))
