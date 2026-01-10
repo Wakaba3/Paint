@@ -294,13 +294,13 @@ class Paint {
         this.setPreferences();
 
         // Background renderer
-        this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle, preferences) => {
-            context.fillStyle = "rgba(0, 0, 0, 0)";
+        this.setObject(0, 0, 0, this.#view.width, this.#view.height, 1, 0, () => (context, x, y, width, height, scale, angle) => {
+            context.fillStyle = this.#preferences.backgroundColor;
             context.fillRect(0, 0, width, height);
         });
 
         // Canvas renderer
-        this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle, preferences) => {
+        this.setObject(10, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
             context.translate(this.#view.width / 2, this.#view.height / 2);
             context.scale(scale, scale);
             context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
@@ -311,8 +311,8 @@ class Paint {
         });
 
         // Grid renderer
-        this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle, preferences) => {
-            if (!preferences.displayGrid)
+        this.setObject(20, 0, 0, this.width, this.height, 1, 0, (context, x, y, width, height, scale, angle) => {
+            if (!this.#preferences.displayGrid)
                 return;
 
             width *= scale;
@@ -615,8 +615,6 @@ class Paint {
 
         this.#preferences.backgroundColor = preferences.backgroundColor ?? this.#preferences.backgroundColor;
         this.#preferences.displayGrid = preferences.displayGrid ?? this.#preferences.displayGrid;
-
-        this.#registerBuffer("preferneces", Object.assign({}, this.#preferences));
 
         this.repaint();
     }
