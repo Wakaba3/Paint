@@ -70,6 +70,10 @@ worker.postMessage({
     height: 1024
 }, [view]);
 
+displayGrid.addEventListener("input", event => {
+    setPreferences({ displayGrid: event.target.checked });
+});
+
 // Prevent right clicking
 addEventListener("contextmenu", event => event.preventDefault(), { passive: false });
 
@@ -87,10 +91,6 @@ addEventListener("panelopen", event => {
 
 addEventListener("panelclose", event => {
     switch (event.detail.id) {
-        case "display-panel":
-            setPreferences({ displayGrid: displayGrid.checked });
-
-            break;
         case "import-panel":
             importImages(Array.from(importChooser.files));
 
