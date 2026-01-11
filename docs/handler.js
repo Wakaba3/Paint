@@ -36,10 +36,8 @@ worker.onmessage = event => {
 
             break;
         case "info":
-            undo.style.pointerEvents = event.data.canUndo ? "auto" : "none";
             undo.style.color = event.data.canUndo ? "" : "var(--foreground-color)";
 
-            redo.style.pointerEvents = event.data.canRedo ? "auto" : "none";
             redo.style.color = event.data.canRedo ? "" : "var(--foreground-color)";
 
             canvasZoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
@@ -110,8 +108,6 @@ addEventListener("pointerdown", event => {
         return;
 
     points.set(event.pointerId, event);
-
-    showMessage("Down");
 })
 
 addEventListener("pointermove", event => {
@@ -162,7 +158,10 @@ addEventListener("keydown", event => {
         const length = Math.sqrt(dx * dx + dy * dy);
 
         if (length > 0) {
-            translateCanvas(dx / length, dy / length);
+            dx /= length;
+            dy /= length;
+
+            translateCanvas(dx * 64, dy * 64);
         }
     }
 

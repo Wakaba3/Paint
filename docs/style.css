@@ -131,6 +131,7 @@ html, body {
 }
 
 #tool-bar {
+    pointer-events: auto;
     display: flex;
     justify-content: center;
     align-items: center;
