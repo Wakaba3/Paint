@@ -110,6 +110,8 @@ addEventListener("pointerdown", event => {
         return;
 
     points.set(event.pointerId, event);
+
+    showMessage("Down");
 })
 
 addEventListener("pointermove", event => {
