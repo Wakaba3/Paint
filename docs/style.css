@@ -183,7 +183,6 @@ html, body {
 #import-chooser {
     pointer-events: auto;
     padding: 5px;
-    width: 80%;
     border-radius: 5px;
 }
 
