@@ -6,8 +6,8 @@ const context = buffer.getContext("2d", { willReadFrequently : true });
 
 const undo = document.getElementById("undo");
 const redo = document.getElementById("redo");
-const zoomOut = document.getElementById("zoom-out");
-const zoomIn = document.getElementById("zoom-in");
+const canvasZoomOut = document.getElementById("canvas-zoom-out");
+const canvasZoomIn = document.getElementById("canvas-zoom-in");
 
 const displayGrid = document.getElementById("display-grid");
 
@@ -35,10 +35,10 @@ worker.onmessage = event => {
             undo.style.color = event.data.canvas.canUndo ? "" : "var(--foreground-color)";
             redo.style.pointerEvents = event.data.canvas.canRedo ? "auto" : "none";
             redo.style.color = event.data.canvas.canRedo ? "" : "var(--foreground-color)";
-            zoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
-            zoomOut.style.color = event.data.canZoomOut ? "" : "var(--foreground-color)";
-            zoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
-            zoomIn.style.color = event.data.canZoomIn ? "" : "var(--foreground-color)";
+            canvasZoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
+            canvasZoomOut.style.color = event.data.canZoomOut ? "" : "var(--foreground-color)";
+            canvasZoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
+            canvasZoomIn.style.color = event.data.canZoomIn ? "" : "var(--foreground-color)";
             
             break;
         case "message":
