@@ -187,21 +187,26 @@ function setup() {
 
         if (target instanceof HTMLElement && target.classList.contains("panel") && target.hasAttribute("draggable")) {
             const param = params.get(target);
+            const rect = target.getBoundingClientRect();
 
             param.dragging = true;
-            param.offsetX = target.offsetLeft - event.pageX;
-            param.offsetY = target.offsetTop - event.pageY;
+            param.offsetX = rect.x - event.pageX;
+            param.offsetY = rect.y - event.pageY;
         }
     });
 
     addEventListener("pointermove", event => {
+        let rect;
+
         params.forEach((params, panel) => {
             if (params.dragging) {
+                rect = panel.getBoundingClientRect();
+
                 panel.style.left = Math.min(window.innerWidth - 1, Math.max(event.pageX + params.offsetX, 0)) + "px";
                 panel.style.top = Math.min(window.innerHeight - 1, Math.max(event.pageY + params.offsetY, 0)) + "px";
 
-                params.normalX = panel.offsetLeft / window.innerWidth;
-                params.normalY = panel.offsetTop / window.innerHeight;
+                params.normalX = rect.x / window.innerWidth;
+                params.normalY = rect.y / window.innerHeight;
             }
         });
     });
