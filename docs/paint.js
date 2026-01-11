@@ -640,14 +640,14 @@ class Paint {
         this.repaint();
     }
 
-    translateObject(index = 0, dx = 0, dy = 0, limiter = false) {
+    translateObject(index = 0, dx = 0, dy = 0, discrete = false) {
         this.#bindObject(index);
 
         dx = Number.isFinite(dx) ? dx : 0;
         dy = Number.isFinite(dy) ? dy : 0;
 
-        dx = limiter ? dx * Math.max(1, Paint.#MAX_SCALE / this.#bindingObject.scale) : dx / this.#bindingObject.scale;
-        dy = limiter ? dy * Math.max(1, Paint.#MAX_SCALE / this.#bindingObject.scale) : dy / this.#bindingObject.scale;
+        dx = discrete ? dx * Math.max(1, Paint.#MAX_SCALE / this.#bindingObject.scale) : dx / this.#bindingObject.scale;
+        dy = discrete ? dy * Math.max(1, Paint.#MAX_SCALE / this.#bindingObject.scale) : dy / this.#bindingObject.scale;
 
         this.#bindingObject.x += dx;
         this.#bindingObject.y += dy;
@@ -824,7 +824,7 @@ onmessage = event => {
 
             break;
         case "translate":
-            Paint.INSTANCE.translateObject(event.data.index, event.data.dx, event.data.dy, event.data.limiter);
+            Paint.INSTANCE.translateObject(event.data.index, event.data.dx, event.data.dy, event.data.discrete);
 
             break;
         case "scale":
