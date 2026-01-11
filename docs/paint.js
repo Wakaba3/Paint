@@ -521,20 +521,23 @@ class Paint {
         const context = this.#buffer.context;
 
         data.forEach(element => {
-            if (Object.hasOwn(element, "name") && Object.hasOwn(element, "content")) {
-                if (element.content instanceof ImageBitmap) {
-                    context.canvas.width = element.content.width;
-                    context.canvas.height = element.content.height;
+            element = Object.assign({
+                name: "",
+                content: null
+            }, element);
 
-                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-                    context.drawImage(element.content, 0, 0);
+            if (element.content instanceof ImageBitmap) {
+                context.canvas.width = element.content.width;
+                context.canvas.height = element.content.height;
 
-                    element.content.close();
+                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                context.drawImage(element.content, 0, 0);
 
-                    this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", context.getImageData(0, 0, context.canvas.width, context.canvas.height)));
-                } else if (element.content instanceof ImageData) {
-                    this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", element.content));
-                }
+                element.content.close();
+
+                this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", context.getImageData(0, 0, context.canvas.width, context.canvas.height)));
+            } else if (element.content instanceof ImageData) {
+                this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", element.content));
             }
         });
     }
