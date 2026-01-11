@@ -1,7 +1,7 @@
 setup();
 
 function setup() {
-    //Style definition
+    // Style definition
     const style = document.createElement("style");
 
     style.textContent = `
@@ -106,7 +106,7 @@ function setup() {
 
     document.body.appendChild(style);
 
-    //Element Modification
+    // Element Modification
     const panels = document.querySelectorAll(".panel");
 
     let onclick, contents, body, close, children;
@@ -145,7 +145,7 @@ function setup() {
         panel.appendChild(contents);
     });
 
-    //Element handling
+    // Element handling
     const params = new Map();
     const messages = new Map();
 
