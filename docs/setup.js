@@ -15,7 +15,6 @@ function setup() {
             max-width: 100%;
             max-height: 100%;
             z-index: 1;
-            text-wrap: wrap;
             overflow: hidden;
             border: thin solid var(--foreground-color);
             border-radius: 10px;
