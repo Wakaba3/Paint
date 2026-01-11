@@ -185,7 +185,7 @@ function setup() {
     addEventListener("pointerdown", event => {
         const target = event.target;
 
-        if (target instanceof HTMLElement && target.classList.contains("panel") && target.hasAttribute("draggable")) {
+        if (target.classList.contains("panel") && target.hasAttribute("draggable")) {
             const param = params.get(target);
             const rect = target.getBoundingClientRect();
 
