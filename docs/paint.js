@@ -150,7 +150,7 @@ class Canvas {
 
         data.length = 0;
         start = Number.isFinite(start) ? Math.max(0, start) : 0;
-        end = Numner.isFinite(end) ? Math.min(end, this.#layers.length) : this.#layers.length;
+        end = Number.isFinite(end) ? Math.min(end, this.#layers.length) : this.#layers.length;
 
         main:
         for (let i = start; i < end; ++i) {
