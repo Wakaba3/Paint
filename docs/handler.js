@@ -106,7 +106,7 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("pointerdown", event => {
-    if (event.target !== document.body)
+    if (event.target.id !== "contents")
         return;
 
     points.set(event.pointerId, event);
