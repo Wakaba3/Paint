@@ -86,7 +86,7 @@ html, body {
     background-color: var(--background-color);
 }
 
-#transform {
+#canvas-transform {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -99,26 +99,26 @@ html, body {
     border-radius: 10px;
 }
 
-#zoom,
-#rotate {
+#canvas-zoom,
+#canvas-rotate {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 5px;
 }
 
-#translate {
+#canvas-translate {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 5px;
 }
 
-#zoom-out,
-#zoom-in,
-#rotate-left,
-#rotate-right,
-#center {
+#canvas-zoom-out,
+#canvas-zoom-in,
+#canvas-rotate-left,
+#canvas-rotate-right,
+#canvas-center {
     pointer-events: auto;
     flex: 1;
     width: 30px;
@@ -227,11 +227,11 @@ html, body {
 
 #undo:active,
 #redo:active,
-#zoom-out:active,
-#zoom-in:active,
-#rotate-left:active,
-#rotate-right:active,
-#center:active,
+#canvas-zoom-out:active,
+#canvas-zoom-in:active,
+#canvas-rotate-left:active,
+#canvas-rotate-right:active,
+#canvas-center:active,
 #tool-bar > *:active,
 #display:active,
 #import:active,

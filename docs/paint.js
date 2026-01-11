@@ -24,7 +24,7 @@ class LayerList {
 
 class Frame {
     constructor(width = 0, height = 0) {
-        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width < 0 || height < 0) {
             postMessage({
                 type: "error",
                 error: `Invalid size: (width, height) = (${width}, ${height})`
@@ -188,12 +188,14 @@ class Canvas {
             buffer.clearRect(0, 0, width, height);
 
             this.#layers.forEach(layer => {
-                buffer.putImageData(layer.imageData, 0, 0);
+                if (layer.imageData instanceof ImageData) {
+                    buffer.putImageData(layer.imageData, 0, 0);
 
-                context.globalCompositeOperation = layer.blendMode;
-                context.drawImage(this.#buffer.canvas, 0, 0);
+                    context.globalCompositeOperation = layer.blendMode;
+                    context.drawImage(this.#buffer.canvas, 0, 0);
 
-                buffer.clearRect(0, 0, width, height);
+                    buffer.clearRect(0, 0, width, height);
+                }
             });
 
             target.drawImage(this.#canvas.canvas, x, y);
@@ -273,6 +275,7 @@ class Paint {
 
     #view;
     #context;
+    #buffer;
     #canvas;
     #preferences;
 
@@ -281,8 +284,6 @@ class Paint {
     #bindingIndex;
     #bindingObject;
 
-    #buffers;
-
     #renderer;
     #repaint;
 
@@ -290,14 +291,13 @@ class Paint {
         this.#view = view;
         this.#context = view.getContext("2d");
         this.#context.imageSmoothingEnabled = false;
+        this.#buffer = new Frame(0, 0);
         this.#canvas = new Canvas(width, height);
 
         this.#objects = new Array();
         this.#functions = new Map();
         this.#bindingIndex = -1;
         this.#bindingObject = null;
-
-        this.#buffers = new Map();
 
         this.#repaint = 0;
 
@@ -464,6 +464,32 @@ class Paint {
         });
     }
 
+    import(data) {
+        if (!(data instanceof Array))
+            return;
+
+        const buffer = this.#buffer.canvas;
+        const context = this.#buffer.context;
+
+        data.forEach(element => {
+            if (Object.hasOwn(element, "name") && Object.hasOwn(element, "content")) {
+                if (element.content instanceof ImageBitmap) {
+                    buffer.width = element.content.width;
+                    buffer.height = element.content.height;
+
+                    context.clearRect(0, 0, buffer.width, buffer.height);
+                    context.drawImage(element.content, 0, 0);
+
+                    element.content.close();
+
+                    this.canvas.bind(this.canvas.addLayer(element.name, "source-over", context.getImageData(0, 0, buffer.width, buffer.height)));
+                } else if (element.content instanceof ImageData) {
+                    this.canvas.bind(this.canvas.addLayer(element.name, "source-over", element.content));
+                }
+            }
+        });
+    }
+
     #bindObject(index = 0) {
         if (index !== this.#bindingIndex) {
             this.#bindingIndex = index;
@@ -598,32 +624,6 @@ class Paint {
         this.#functions.delete(name);
     }
 
-    #getBuffer(name = "") {
-        return this.#buffers.get(name);
-    }
-
-    #registerBuffer(name = "", image = null) {
-        if (image) {
-            this.#closeBuffer(name);
-
-            this.#buffers.set(name, image);
-        }
-
-        return image;
-    }
-
-    #closeBuffer(name = "") {
-        const image = this.#buffers.get(name);
-
-        if (image) {
-            if (image instanceof ImageBitmap) {
-                image.close();
-            }
-
-            this.#buffers.delete(name);
-        }
-    }
-
     #createPreferences() {
         return {
             backgroundColor: "rgba(0, 0, 0, 0)",
@@ -665,22 +665,8 @@ onmessage = event => {
 
             break;
         case "import":
-            const canvas = Paint.INSTANCE.canvas;
-
-            event.data.objects.forEach(object => {
-                if (object.content instanceof ImageData) {
-
-                    canvas.bind(canvas.addLayer(object.name, "source-over", object.content));
-
-                } else if (object.context instanceof ImageBitmap) {
-
-                    canvas.draw(canvas.addLayer(object.name), context => context.drawImage(object.content, 0, 0));
-                    object.content.close();
-
-                }
-            });
-
-            canvas.save();
+            Paint.INSTANCE.import(event.data.contents);
+            Paint.INSTANCE.canvas.save();
             Paint.INSTANCE.repaint();
 
             break;

@@ -19,17 +19,17 @@
                 <div id="undo" translate="no" onclick="undoCanvas()">U</div>
                 <div id="redo" translate="no" onclick="redoCanvas()">R</div>
             </div>
-            <div id="transform">
-                <div id="zoom">
-                    <div id="zoom-out" translate="no" onclick="scaleCanvas(Math.SQRT1_2)">−</div>
-                    <div id="zoom-in" translate="no" onclick="scaleCanvas(Math.SQRT2)">＋</div>
+            <div id="canvas-transform">
+                <div id="canvas-zoom">
+                    <div id="canvas-zoom-out" translate="no" onclick="scaleCanvas(Math.SQRT1_2)">−</div>
+                    <div id="canvas-zoom-in" translate="no" onclick="scaleCanvas(Math.SQRT2)">＋</div>
                 </div>
-                <div id="rotate">
-                    <div id="rotate-left" translate="no" onclick="rotateCanvas(30)">L</div>
-                    <div id="rotate-right" translate="no" onclick="rotateCanvas(-30)">R</div>
+                <div id="canvas-rotate">
+                    <div id="canvas-rotate-left" translate="no" onclick="rotateCanvas(30)">L</div>
+                    <div id="canvas-rotate-right" translate="no" onclick="rotateCanvas(-30)">R</div>
                 </div>
-                <div id="translate">
-                    <div id="center" translate="no" onclick="centerCanvas()">C</div>
+                <div id="canvas-translate">
+                    <div id="canvas-center" translate="no" onclick="centerCanvas()">C</div>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <div></div>
             <div></div>
             <div></div>
-            <div></div>
+            <div id="transform" translate="no">T</div>
             <div id="filter" translate="no">F</div>
             <div id="layer" translate="no" onclick="togglePanel('layer-panel')">L</div>
             <div id="preference" translate="no" onclick="togglePanel('preference-panel')">P</div>

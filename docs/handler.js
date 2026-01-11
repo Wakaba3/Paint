@@ -153,37 +153,23 @@ function importImages(files = []) {
         return;
 
     Promise.all(files.map(file => createImageBitmap(file).then(image => {
-        buffer.width = image.width;
-        buffer.height = image.height;
-
-        context.clearRect(0, 0, buffer.width, buffer.height);
-        context.drawImage(image, 0, 0);
-
-        image.close();
-
         return {
             name: file.name, 
-            content: context.getImageData(0, 0, buffer.width, buffer.height)
+            content: image
         };
     }).catch(error => {
         return {
             name: "",
             content: null
         };
-    }))).then(objects => {
-        if (objects.length > 0) {
+    }))).then(contents => {
+        if (contents.length > 0) {
             worker.postMessage({
                 type: "import",
-                objects: objects
+                contents: contents
             });
-        }
 
-        if (objects.length > 0) {
-            if (objects.length === 1) {
-                showMessage("画像を読み込みました");
-            } else {
-                showMessage(`${objects.length}枚の画像を読み込みました`);
-            }
+            showMessage(contents.length === 1 ? "画像を読み込みました" : `${contents.length}枚の画像を読み込みました`);
         }
     }).catch(error => {
         showMessage("画像の読み込みに失敗しました！");
