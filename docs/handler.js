@@ -108,6 +108,8 @@ addEventListener("pointerdown", event => {
 
 addEventListener("pointermove", event => {
     points.set(event.pointerId, event);
+
+    showMessage(`twist: ${event.twist}`);
 });
 
 addEventListener("pointerup", event => {
