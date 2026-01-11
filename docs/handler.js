@@ -17,8 +17,9 @@ const sizeWidth = document.getElementById("size-width");
 const sizeHeight = document.getElementById("size-height");
 
 const points = new Map();
-const axis = { x: 0, y: 0, angle: 0 };
 const keys = new Set();
+let primary;
+let axis;
 
 let canvasData;
 let bindingLayer;
@@ -108,6 +109,9 @@ addEventListener("pointerdown", event => {
         return;
 
     points.set(event.pointerId, event);
+
+    if (event.isPrimary)
+        primary = event.pointerId;
 })
 
 addEventListener("pointermove", event => {
@@ -116,7 +120,8 @@ addEventListener("pointermove", event => {
     if (point instanceof PointerEvent) {
         if (points.size === 1) {
             translateCanvas(event.pageX - point.pageX, event.pageY - point.pageY);
-        } else if (points.size === 2) {}
+        } else if (points.size === 2) {
+        }
 
         points.set(event.pointerId, event);
     }
@@ -124,6 +129,9 @@ addEventListener("pointermove", event => {
 
 addEventListener("pointerup", event => {
     points.delete(event.pointerId);
+
+    if (event.isPrimary)
+        primary = NaN;
 });
 
 addEventListener("keydown", event => {
