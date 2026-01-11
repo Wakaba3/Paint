@@ -161,7 +161,7 @@ addEventListener("keydown", event => {
             dx /= length;
             dy /= length;
 
-            translateCanvas(dx * 64, dy * 64);
+            translateCanvas(dx * 64, dy * 64, true);
         }
     }
 
@@ -226,12 +226,13 @@ function centerCanvas() {
     });
 }
 
-function translateCanvas(dx = 0, dy = 0) {
+function translateCanvas(dx = 0, dy = 0, scaling = false) {
     worker.postMessage({
         type: "translate",
         index: 10,
         dx: dx,
-        dy: dy
+        dy: dy,
+        scaling: scaling
     });
 }
 
