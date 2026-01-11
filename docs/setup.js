@@ -190,8 +190,8 @@ function setup() {
             const rect = target.getBoundingClientRect();
 
             param.dragging = true;
-            param.offsetX = window.scrollX + rect.x - event.pageX;
-            param.offsetY = window.scrollY + rect.y - event.pageY;
+            param.offsetX = window.scrollX + rect.x + rect.width / 2 - event.pageX;
+            param.offsetY = window.scrollY + rect.y + rect.height / 2 - event.pageY;
         }
     });
 
@@ -205,8 +205,8 @@ function setup() {
                 panel.style.left = Math.min(window.innerWidth - 1, Math.max(event.pageX + params.offsetX, 0)) + "px";
                 panel.style.top = Math.min(window.innerHeight - 1, Math.max(event.pageY + params.offsetY, 0)) + "px";
 
-                params.normalX = (window.scrollX + rect.x) / window.innerWidth;
-                params.normalY = (window.scrollY + rect.y) / window.innerHeight;
+                params.normalX = (window.scrollX + rect.x + rect.width / 2) / window.innerWidth;
+                params.normalY = (window.scrollY + rect.y + rect.height / 2) / window.innerHeight;
             }
         });
     });
