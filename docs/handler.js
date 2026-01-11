@@ -106,18 +106,22 @@ addEventListener("panelclose", event => {
 });
 
 addEventListener("pointerdown", event => {
+    if (event.target !== document.body)
+        return;
+
     points.set(event.pointerId, event);
 })
 
 addEventListener("pointermove", event => {
-    const point = points.get(event.pointerId) ?? event;
+    const point = points.get(event.pointerId);
 
-    if (points.size === 1) {
-        translateCanvas(event.pageX - point.pageX, event.pageY - point.pageY);
-    } else if (points.size === 2) {
+    if (point) {
+        if (points.size === 1) {
+            translateCanvas(event.pageX - point.pageX, event.pageY - point.pageY);
+        } else if (points.size === 2) {
+            points.set(event.pointerId, event);
+        }
     }
-
-    points.set(event.pointerId, event);
 });
 
 addEventListener("pointerup", event => {
