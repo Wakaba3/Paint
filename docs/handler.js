@@ -226,13 +226,13 @@ function centerCanvas() {
     });
 }
 
-function translateCanvas(dx = 0, dy = 0, scaling = false) {
+function translateCanvas(dx = 0, dy = 0, limiter = false) {
     worker.postMessage({
         type: "translate",
         index: 10,
         dx: dx,
         dy: dy,
-        scaling: scaling
+        limiter: limiter
     });
 }
 
