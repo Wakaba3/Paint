@@ -115,7 +115,7 @@ addEventListener("pointerdown", event => {
 addEventListener("pointermove", event => {
     const point = points.get(event.pointerId);
 
-    if (point) {
+    if (point instanceof PointerEvent) {
         if (points.size === 1) {
             translateCanvas(event.pageX - point.pageX, event.pageY - point.pageY);
         } else if (points.size === 2) {
