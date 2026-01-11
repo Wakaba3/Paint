@@ -17,8 +17,10 @@ const sizeWidth = document.getElementById("size-width");
 const sizeHeight = document.getElementById("size-height");
 
 const points = new Map();
+const axis = { x: 0, y: 0, angle: 0 };
 const keys = new Set();
 
+let canvasData;
 let bindingLayer;
 let layerData;
 
@@ -48,6 +50,7 @@ worker.onmessage = event => {
 
             displayGrid.checked = event.data.displayGrid;
 
+            canvasData = event.data.canvasData;
             bindingLayer = event.data.bindingLayer;
             layerData = event.data.layerData;
             
@@ -107,9 +110,14 @@ addEventListener("pointerdown", event => {
 })
 
 addEventListener("pointermove", event => {
-    points.set(event.pointerId, event);
+    const point = points.get(event.pointerId) ?? event;
 
-    showMessage(`twist: ${event.twist}`);
+    if (points.size === 1) {
+        translateCanvas(event.pageX - point.pageX, event.pageY - point.pageY);
+    } else if (points.size === 2) {
+    }
+
+    points.set(event.pointerId, event);
 });
 
 addEventListener("pointerup", event => {

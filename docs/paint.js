@@ -547,6 +547,15 @@ class Paint {
         postMessage({
             type: "info",
 
+            canvasData: {
+                x: this.#bindingObject.x,
+                y: this.#bindingObject.y,
+                width: this.#bindingObject.width,
+                height: this.#bindingObject.height,
+                scale: this.#bindingObject.scale,
+                angle: this.#bindingObject.angle,
+            },
+
             bindingLayer: canvas.bindingLayer,
             layerData: canvas.layerData,
 
