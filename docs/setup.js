@@ -155,7 +155,7 @@ function setup() {
             offsetX: 0,
             offsetY: 0,
             normalX: 0.5,
-            normalY: 0.5
+            normalY: 0.5,
         });
     });
 
@@ -185,7 +185,7 @@ function setup() {
     addEventListener("pointerdown", event => {
         const target = event.target;
 
-        if (target.classList.contains("panel") && target.hasAttribute("draggable")) {
+        if (target instanceof Element && target.classList.contains("panel") && target.hasAttribute("draggable")) {
             const param = params.get(target);
             const rect = target.getBoundingClientRect();
 

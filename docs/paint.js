@@ -69,7 +69,7 @@ class Canvas {
 
     constructor(width = 0, height = 0) {
         this.#canvas = new Frame(width, height);
-        this.#buffer = new Frame(width, height);
+        this.#buffer = new Frame(0, 0);
 
         this.#layers = [];
         this.#lists = [];
@@ -141,7 +141,7 @@ class Canvas {
     }
 
     resize(width = 0, height = 0) {
-        return this.#canvas.resize(width, height) && this.#buffer.resize(width, height);
+        return this.#canvas.resize(width, height);
     }
 
     apply() {
@@ -177,7 +177,41 @@ class Canvas {
         }
     }
 
-    output(target = null, x = 0, y = 0) {
+    upload(index) {
+        if (!Number.isFinite(index))
+            index = this.#bindingIndex;
+
+        if (0 <= index && index < this.#layers.length) {
+            const layer = this.#layers[index];
+
+            if (layer instanceof Layer) {
+                const imageData = layer.imageData;
+                const context = this.#buffer.context;
+
+                context.canvas.width = imageData.width;
+                context.canvas.height = imageData.height
+
+                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                context.putImageData(imageData, 0, 0);
+
+                context.canvas.transferToImageBitmap().then(image => {
+                    postMessage({
+                        type: "upload",
+                        content: {
+                            index: index,
+                            name: layer.name,
+                            blendMode: layer.blendMode,
+                            image: image
+                        }
+                    });
+                });
+            }
+        }
+
+        return null;
+    }
+
+    composite(target = null, x = 0, y = 0) {
         if (target instanceof OffscreenCanvasRenderingContext2D) {
             const context = this.#canvas.context;
             const buffer = this.#buffer.context;
@@ -185,20 +219,21 @@ class Canvas {
             const height = this.height;
 
             context.clearRect(0, 0, width, height);
-            buffer.clearRect(0, 0, width, height);
 
             this.#layers.forEach(layer => {
                 if (layer.imageData instanceof ImageData) {
+                    buffer.canvas.width = layer.imageData.width;
+                    buffer.canvas.height = layer.imageData.height;
+
+                    buffer.clearRect(0, 0, buffer.canvas.width, buffer.canvas.height);
                     buffer.putImageData(layer.imageData, 0, 0);
 
                     context.globalCompositeOperation = layer.blendMode;
-                    context.drawImage(this.#buffer.canvas, 0, 0);
-
-                    buffer.clearRect(0, 0, width, height);
+                    context.drawImage(buffer.canvas, 0, 0);
                 }
             });
 
-            target.drawImage(this.#canvas.canvas, x, y);
+            target.drawImage(context.canvas, x, y);
         }
     }
 
@@ -261,7 +296,7 @@ class Canvas {
     get info() {
         return {
             canUndo: this.#bindingRecord > 0,
-            canRedo: this.#bindingRecord < this.#records.length - 1
+            canRedo: this.#bindingRecord < this.#records.length - 1,
         };
     }
 }
@@ -316,7 +351,7 @@ class Paint {
             context.translate(x + (width - this.#view.width) / 2, y + (height - this.#view.height) / 2);
             context.rotate(angle * Paint.#RADIAN);
             context.translate(width / -2, height / -2);
-            this.#canvas.output(context);
+            this.#canvas.composite(context);
             context.resetTransform();
         });
 
@@ -405,14 +440,16 @@ class Paint {
         });
     }
 
-    resize(width = 0, height = 0) {
-        if (this.#canvas.resize(width, height)) {
-            this.repaint();
+    save() {
+        this.#canvas.save();
+    }
 
-            return true;
-        }
+    undo() {
+        return this.#canvas.undo();
+    }
 
-        return false;
+    redo() {
+        return this.#canvas.redo();
     }
 
     run() {
@@ -445,10 +482,11 @@ class Paint {
         this.#repaint = Number.isFinite(this.#repaint) ? this.#repaint : 1;
 
         this.#bindObject(10);
+        
+        const info = this.#canvas.info;
 
         postMessage({
-            type: "repaint",
-            canvas: this.#canvas.info,
+            type: "info",
             x: this.#bindingObject.x,
             y: this.#bindingObject.y,
             width: this.#bindingObject.width,
@@ -459,35 +497,50 @@ class Paint {
             backgroundColor: this.#preferences.backgroundColor,
             displayGrid: this.#preferences.displayGrid,
 
-            canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE,
-            canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE
+            canRedo: info.canRedo,
+            canUndo: info.canUndo,
+            canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE,
+            canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE
         });
+    }
+
+    resize(width = 0, height = 0) {
+        if (this.#canvas.resize(width, height)) {
+            this.repaint();
+
+            return true;
+        }
+
+        return false;
     }
 
     import(data) {
         if (!(data instanceof Array))
             return;
 
-        const buffer = this.#buffer.canvas;
         const context = this.#buffer.context;
 
         data.forEach(element => {
             if (Object.hasOwn(element, "name") && Object.hasOwn(element, "content")) {
                 if (element.content instanceof ImageBitmap) {
-                    buffer.width = element.content.width;
-                    buffer.height = element.content.height;
+                    context.canvas.width = element.content.width;
+                    context.canvas.height = element.content.height;
 
-                    context.clearRect(0, 0, buffer.width, buffer.height);
+                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
                     context.drawImage(element.content, 0, 0);
 
                     element.content.close();
 
-                    this.canvas.bind(this.canvas.addLayer(element.name, "source-over", context.getImageData(0, 0, buffer.width, buffer.height)));
+                    this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", context.getImageData(0, 0, context.canvas.width, context.canvas.height)));
                 } else if (element.content instanceof ImageData) {
-                    this.canvas.bind(this.canvas.addLayer(element.name, "source-over", element.content));
+                    this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", element.content));
                 }
             }
         });
+    }
+
+    upload(index) {
+        this.#canvas.upload(index);
     }
 
     #bindObject(index = 0) {
@@ -637,10 +690,6 @@ class Paint {
         this.repaint();
     }
 
-    get canvas() {
-        return this.#canvas;
-    }
-
     get width() {
         return this.#canvas.width;
     }
@@ -666,7 +715,7 @@ onmessage = event => {
             break;
         case "import":
             Paint.INSTANCE.import(event.data.contents);
-            Paint.INSTANCE.canvas.save();
+            Paint.INSTANCE.save();
             Paint.INSTANCE.repaint();
 
             break;
@@ -674,7 +723,7 @@ onmessage = event => {
             const successful = Paint.INSTANCE.resize(event.data.width, event.data.height);
 
             if (successful)
-                Paint.INSTANCE.canvas.save();
+                Paint.INSTANCE.save();
 
             postMessage({
                 type: "resize",
@@ -705,7 +754,7 @@ onmessage = event => {
 
             break;
         case "undo":
-            if (Paint.INSTANCE.canvas.undo()) {
+            if (Paint.INSTANCE.undo()) {
                 Paint.INSTANCE.repaint();
 
                 postMessage({
@@ -716,7 +765,7 @@ onmessage = event => {
 
             break;
         case "redo":
-            if (Paint.INSTANCE.canvas.redo()) {
+            if (Paint.INSTANCE.redo()) {
                 Paint.INSTANCE.repaint();
 
                 postMessage({
@@ -730,6 +779,8 @@ onmessage = event => {
             Paint.INSTANCE.setPreferences(event.data.preferences);
 
             break;
+        case "upload":
+            Paint.INSTANCE.upload(event.data.index);
         case "repaint":
             Paint.INSTANCE.repaint();
 

@@ -30,11 +30,11 @@ worker.onmessage = event => {
             }
 
             break;
-        case "repaint":
-            undo.style.pointerEvents = event.data.canvas.canUndo ? "auto" : "none";
-            undo.style.color = event.data.canvas.canUndo ? "" : "var(--foreground-color)";
-            redo.style.pointerEvents = event.data.canvas.canRedo ? "auto" : "none";
-            redo.style.color = event.data.canvas.canRedo ? "" : "var(--foreground-color)";
+        case "info":
+            undo.style.pointerEvents = event.data.canUndo ? "auto" : "none";
+            undo.style.color = event.data.canUndo ? "" : "var(--foreground-color)";
+            redo.style.pointerEvents = event.data.canRedo ? "auto" : "none";
+            redo.style.color = event.data.canRedo ? "" : "var(--foreground-color)";
             canvasZoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
             canvasZoomOut.style.color = event.data.canZoomOut ? "" : "var(--foreground-color)";
             canvasZoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
@@ -229,5 +229,12 @@ function setPreferences(preferences = {}) {
     worker.postMessage({
         type: "preferences",
         preferences: preferences
+    });
+}
+
+function uploadLayer(index = NaN) {
+    worker.postMessage({
+        type: "upload",
+        index: index
     });
 }
