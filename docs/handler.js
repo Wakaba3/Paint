@@ -161,7 +161,7 @@ addEventListener("keydown", event => {
             dx /= length;
             dy /= length;
 
-            translateCanvas(dx * 64, dy * 64, true);
+            translateCanvas(dx, dy, true);
         }
     }
 
