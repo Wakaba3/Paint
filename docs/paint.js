@@ -144,6 +144,44 @@ class Canvas {
         return this.#canvas.resize(width, height);
     }
 
+    #aggregate(data = [], start = 0, end = this.#layers.length, lists = Array.from(this.#lists)) {
+        const length = lists.length;
+        let layer, list;
+
+        data.length = 0;
+        start = Number.isFinite(start) ? Math.max(0, start) : 0;
+        end = Numner.isFinite(end) ? Math.min(end, this.#layers.length) : this.#layers.length;
+
+        main:
+        for (let i = start; i < end; ++i) {
+            layer = this.#layers[i];
+
+            if (layer instanceof Layer) {
+                for (let j = 0; j < length; ++j) {
+                    list = lists[j];
+
+                    if (i === list.start && list.start + list.length <= end) {
+                        i += list.length;
+
+                        lists.splice(j, 1);
+
+                        data.push(this.#aggregate([], list.start, list.start + list.length, lists));
+
+                        continue main;
+                    }
+                }
+
+                data.push({
+                    index: i,
+                    name: layer.name,
+                    blendMode: layer.blendMode
+                });
+            }
+        }
+
+        return data;
+    }
+
     apply() {
         if (this.#bindingLayer) {
             this.#bindingLayer.imageData = this.#canvas.context.getImageData(0, 0, this.width, this.height);
@@ -177,38 +215,53 @@ class Canvas {
         }
     }
 
-    upload(index) {
-        if (!Number.isFinite(index))
-            index = this.#bindingIndex;
+    upload(indexes = []) {
+        if (indexes instanceof Array) {
+            if (indexes.length === 0) {
+                this.upload([this.#bindingIndex]);
 
-        if (0 <= index && index < this.#layers.length) {
-            const layer = this.#layers[index];
+                return;
+            }
+        } else {
+            if (Number.isFinite(indexes)) {
+                this.upload([indexes]);
+            }
 
-            if (layer instanceof Layer) {
-                const imageData = layer.imageData;
-                const context = this.#buffer.context;
+            return;
+        }
 
-                context.canvas.width = imageData.width;
-                context.canvas.height = imageData.height
+        Promise.all(indexes.map(index => {
+            if (0 <= index && index < this.#layers.length) {
+                const layer = this.#layers[index];
 
-                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-                context.putImageData(imageData, 0, 0);
+                if (layer instanceof Layer) {
+                    const imageData = layer.imageData;
+                    const context = this.#buffer.context;
 
-                context.canvas.transferToImageBitmap().then(image => {
-                    postMessage({
-                        type: "upload",
-                        content: {
+                    context.canvas.width = imageData.width;
+                    context.canvas.height = imageData.height
+
+                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                    context.putImageData(imageData, 0, 0);
+
+                    return context.canvas.transferToImageBitmap().then(image => {
+                        return {
                             index: index,
                             name: layer.name,
                             blendMode: layer.blendMode,
                             image: image
-                        }
+                        };
                     });
-                });
+                }
             }
-        }
 
-        return null;
+            return Promise.resolve(null);
+        })).then(contents => {
+            postMessage({
+                type: "upload",
+                contents: contents.filter(content => content)
+            });
+        });
     }
 
     composite(target = null, x = 0, y = 0) {
@@ -295,8 +348,10 @@ class Canvas {
 
     get info() {
         return {
+            bindingLayer: this.#bindingIndex,
             canUndo: this.#bindingRecord > 0,
             canRedo: this.#bindingRecord < this.#records.length - 1,
+            layerData: this.#aggregate()
         };
     }
 }
@@ -481,24 +536,25 @@ class Paint {
         this.#repaint = Math.max(this.#repaint, attempts);
         this.#repaint = Number.isFinite(this.#repaint) ? this.#repaint : 1;
 
+        this.info();
+    }
+
+    info() {
+        const canvas = this.#canvas.info;
+
         this.#bindObject(10);
-        
-        const info = this.#canvas.info;
 
         postMessage({
             type: "info",
-            x: this.#bindingObject.x,
-            y: this.#bindingObject.y,
-            width: this.#bindingObject.width,
-            height: this.#bindingObject.height,
-            scale: this.#bindingObject.scale,
-            angle: this.#bindingObject.angle,
+
+            bindingLayer: canvas.bindingLayer,
+            layerData: canvas.layerData,
 
             backgroundColor: this.#preferences.backgroundColor,
             displayGrid: this.#preferences.displayGrid,
 
-            canRedo: info.canRedo,
-            canUndo: info.canUndo,
+            canRedo: canvas.canRedo,
+            canUndo: canvas.canUndo,
             canZoomIn: this.#bindingObject.scale < Paint.#MAX_SCALE,
             canZoomOut: this.#bindingObject.scale > Paint.#MIN_SCALE
         });
@@ -540,6 +596,10 @@ class Paint {
                 this.#canvas.bind(this.#canvas.addLayer(element.name, "source-over", element.content));
             }
         });
+    }
+
+    bind(index) {
+        this.#canvas.bind(index);
     }
 
     upload(index) {
@@ -722,6 +782,14 @@ onmessage = event => {
             Paint.INSTANCE.repaint();
 
             break;
+        case "bind":
+            Paint.INSTANCE.bind(event.data.index);
+
+            break;
+        case "upload":
+            Paint.INSTANCE.upload(event.data.index);
+
+            break;
         case "resize":
             const successful = Paint.INSTANCE.resize(event.data.width, event.data.height);
 
@@ -782,8 +850,6 @@ onmessage = event => {
             Paint.INSTANCE.setPreferences(event.data.preferences);
 
             break;
-        case "upload":
-            Paint.INSTANCE.upload(event.data.index);
         case "repaint":
             Paint.INSTANCE.repaint();
 

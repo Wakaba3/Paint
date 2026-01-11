@@ -19,6 +19,9 @@ const sizeHeight = document.getElementById("size-height");
 const points = new Map();
 const keys = new Set();
 
+let bindingLayer;
+let layerData;
+
 worker.onmessage = event => {
     switch (event.data.type) {
         case "resize":
@@ -33,12 +36,20 @@ worker.onmessage = event => {
         case "info":
             undo.style.pointerEvents = event.data.canUndo ? "auto" : "none";
             undo.style.color = event.data.canUndo ? "" : "var(--foreground-color)";
+
             redo.style.pointerEvents = event.data.canRedo ? "auto" : "none";
             redo.style.color = event.data.canRedo ? "" : "var(--foreground-color)";
+
             canvasZoomOut.style.pointerEvents = event.data.canZoomOut ? "auto" : "none";
             canvasZoomOut.style.color = event.data.canZoomOut ? "" : "var(--foreground-color)";
+
             canvasZoomIn.style.pointerEvents = event.data.canZoomIn ? "auto" : "none";
             canvasZoomIn.style.color = event.data.canZoomIn ? "" : "var(--foreground-color)";
+
+            displayGrid.checked = event.data.displayGrid;
+
+            bindingLayer = event.data.bindingLayer;
+            layerData = event.data.layerData;
             
             break;
         case "message":
